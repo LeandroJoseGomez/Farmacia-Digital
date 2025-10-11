@@ -1,0 +1,236 @@
+body {
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      /* Added pharmacy background image with overlay */
+      background-image: 
+        linear-gradient(rgba(232, 248, 245, 0.92), rgba(213, 244, 230, 0.92)),
+        url('public/fondo.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,168,232,0.2);
+      /* Added backdrop blur for modern glass effect */
+      backdrop-filter: blur(10px);
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      text-decoration: none;
+    }
+
+    .navbar-logo {
+      height: 45px;
+      width: auto;
+      background: white;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .navbar-user {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-info {
+      text-align: right;
+      color: white;
+    }
+
+    .user-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .user-email {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .btn-logout {
+      padding: 10px 24px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      color: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-logout:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 50px 20px;
+    }
+
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: fadeIn 0.6s ease-out;
+      /* Added background for better text readability */
+      background: rgba(255, 255, 255, 0.85);
+      padding: 40px;
+      border-radius: 24px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 40px rgba(0,168,232,0.15);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .welcome-section h1 {
+      font-size: 42px;
+      margin-bottom: 12px;
+      color: #003D5C;
+      font-weight: 800;
+    }
+
+    .welcome-section p {
+      font-size: 18px;
+      color: #666;
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 35px;
+      margin-top: 40px;
+    }
+
+    .module-card {
+      /* Enhanced card background for better visibility over pharmacy image */
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 40px rgba(0,168,232,0.1);
+      animation: slideUp 0.6s ease-out;
+      animation-fill-mode: both;
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #00A8E8, #00D9C0);
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+
+    .module-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .module-card:nth-child(1) { animation-delay: 0.1s; }
+    .module-card:nth-child(2) { animation-delay: 0.2s; }
+    .module-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .module-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 20px 60px rgba(0,168,232,0.2);
+      border-color: #00A8E8;
+      /* Full opacity on hover for better focus */
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .module-icon {
+      font-size: 56px;
+      margin-bottom: 24px;
+      display: inline-block;
+      transition: transform 0.3s;
+    }
+
+    .module-card:hover .module-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .module-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #003D5C;
+      margin-bottom: 14px;
+    }
+
+    .module-description {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .module-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: #fff;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,168,232,0.3);
+    }
+
+    .module-link:hover {
+      transform: translateX(5px);
+      box-shadow: 0 6px 20px rgba(0,168,232,0.4);
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+      }
+
+      .navbar-user {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .welcome-section h1 {
+        font-size: 32px;
+      }
+
+      .modules-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  

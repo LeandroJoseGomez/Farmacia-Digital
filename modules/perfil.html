@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil - Farmacia Digital</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo2.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      /* Updated background */
+      background: linear-gradient(135deg, #E8F8F5 0%, #D5F4E6 50%, #B2EBF2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .navbar {
+      /* Updated navbar styling */
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,168,232,0.2);
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      text-decoration: none;
+    }
+
+    .navbar-logo {
+      height: 45px;
+      width: auto;
+      background: white;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .btn-back {
+      padding: 10px 24px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      color: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-back:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
+
+    .profile-card {
+      /* Updated card styling */
+      background: white;
+      border-radius: 24px;
+      padding: 45px;
+      box-shadow: 0 10px 40px rgba(0,168,232,0.15);
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #E8F8F5;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      /* Updated avatar gradient */
+      background: linear-gradient(135deg, #00A8E8, #00D9C0);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 25px rgba(0,168,232,0.3);
+    }
+
+    .profile-header h1 {
+      color: #003D5C;
+      font-size: 28px;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .profile-header p {
+      color: #666;
+      font-size: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background: #f8f9fa;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
+      /* Updated focus color */
+      border-color: #00A8E8;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(0,168,232,0.1);
+      background: #fff;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 15px;
+      /* Updated button gradient */
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(0,168,232,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,168,232,0.4);
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: 500;
+      display: none;
+      animation: slideIn 0.3s;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-success {
+      background: #e8f8f5;
+      color: #00A86B;
+      border-left: 4px solid #00A86B;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .profile-card {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <!-- Updated logo to use logo2.png -->
+    <a href="dashboard.html" class="navbar-brand">
+      <img src="../assets/images/logo2.png" alt="Farmacia Digital" class="navbar-logo">
+    </a>
+    <a href="dashboard.html" class="btn-back">← Volver al Dashboard</a>
+  </nav>
+
+  <div class="container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">👤</div>
+        <h1 id="profileName"></h1>
+        <p id="profileEmail"></p>
+      </div>
+
+      <form onsubmit="updateProfile(event)">
+        <div class="form-group">
+          <label for="name">Nombre Completo</label>
+          <input type="text" id="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <input type="tel" id="phone" placeholder="+57 300 123 4567">
+        </div>
+
+        <div class="form-group">
+          <label for="bio">Información Adicional</label>
+          <textarea id="bio" placeholder="Alergias, condiciones médicas, notas importantes..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Guardar Cambios</button>
+
+        <div id="profileAlert" class="alert"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Verificar autenticación
+    const loggedUser = localStorage.getItem("loggedUser");
+    
+    if (!loggedUser) {
+      window.location.href = "index.html";
+    } else {
+      const user = JSON.parse(loggedUser);
+      loadProfile(user);
+    }
+
+    function loadProfile(user) {
+      document.getElementById("profileName").textContent = user.name;
+      document.getElementById("profileEmail").textContent = user.email;
+      document.getElementById("name").value = user.name;
+      document.getElementById("email").value = user.email;
+      
+      // Cargar datos adicionales si existen
+      const profileData = localStorage.getItem(`profile_${user.email}`);
+      if (profileData) {
+        const data = JSON.parse(profileData);
+        document.getElementById("phone").value = data.phone || "";
+        document.getElementById("bio").value = data.bio || "";
+      }
+    }
+
+    function updateProfile(event) {
+      event.preventDefault();
+      
+      const user = JSON.parse(loggedUser);
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const bio = document.getElementById("bio").value.trim();
+      
+      // Actualizar usuario
+      user.name = name;
+      user.email = email;
+      localStorage.setItem("loggedUser", JSON.stringify(user));
+      
+      // Guardar datos adicionales del perfil
+      const profileData = { phone, bio };
+      localStorage.setItem(`profile_${email}`, JSON.stringify(profileData));
+      
+      // Actualizar en la lista de usuarios
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userIndex = users.findIndex(u => u.email === user.email);
+      if (userIndex !== -1) {
+        users[userIndex].name = name;
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      
+      // Mostrar mensaje de éxito
+      const alert = document.getElementById("profileAlert");
+      alert.textContent = "✓ Perfil actualizado exitosamente";
+      alert.className = "alert alert-success show";
+      
+      setTimeout(() => {
+        alert.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>

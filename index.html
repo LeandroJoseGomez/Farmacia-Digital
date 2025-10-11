@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmacia Digital - Acceso</title>
+  <link rel="icon" href="assets/images/logo.png">
+
+  <!--========== Aqui van todas las referencias a los archivos CSS ==========-->
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="logo-container">
+      <img src="assets/images/logo2.png" alt="Farmacia Digital">
+    </div>
+
+    <div id="loginForm">
+      <div class="header">
+        <h2>Iniciar Sesión</h2>
+        <p>Accede a tu cuenta de Farmacia Digital</p>
+      </div>
+
+      <div class="form-group">
+        <label for="loginEmail">Correo Electrónico o Usuario</label>
+        <input type="text" id="loginEmail" placeholder="ejemplo@correo.com o usuario" autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="loginPassword">Contraseña</label>
+        <input type="password" id="loginPassword" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+      </div>
+
+      <button onclick="login()">Ingresar</button>
+
+      <div id="loginAlert" class="alert"></div>
+
+      <div class="toggle">
+        ¿No tienes cuenta? <a onclick="toggleForms()">Regístrate aquí</a>
+      </div>
+    </div>
+
+    <div id="registerForm" style="display: none;">
+      <div class="header">
+        <h2>Crear Cuenta</h2>
+        <p>Únete a Farmacia Digital</p>
+      </div>
+
+      <div class="form-group">
+        <label for="registerName">Nombre Completo</label>
+        <input type="text" id="registerName" placeholder="Juan Pérez" autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label for="registerEmail">Correo Electrónico</label>
+        <input type="email" id="registerEmail" placeholder="ejemplo@correo.com" autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="registerPassword">Contraseña</label>
+        <input type="password" id="registerPassword" placeholder="Mínimo 8 caracteres" autocomplete="new-password"
+          oninput="checkPasswordStrength()">
+        <div id="passwordStrength" class="password-strength"></div>
+      </div>
+
+      <button onclick="register()">Crear Cuenta</button>
+
+      <div id="registerAlert" class="alert"></div>
+
+      <div class="toggle">
+        ¿Ya tienes cuenta? <a onclick="toggleForms()">Inicia sesión</a>
+      </div>
+    </div>
+  </div>
+
+<!--========== Aqui van todas las referencias a los archivos JS ==========-->
+  <script src="assets/js/script.js"></script>
+
+
+</body>
+
+</html>

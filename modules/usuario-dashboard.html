@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmacia Digital - Catálogo</title>
+  <link rel="icon" type="image/png" href="public/logo2.png">
+  <link rel="stylesheet" href="../assets/css/usuario-dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <img src="../assets/images/logo2.png" alt="Farmacia Digital">
+      <h1>Farmacia Digital</h1>
+    </div>
+    <div class="navbar-user">
+      <div class="cart-icon" onclick="viewCart()">
+        🛒
+        <span class="cart-count" id="cartCount">0</span>
+      </div>
+      <span class="user-info" id="userName">Usuario</span>
+      <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="search-bar">
+    <input type="text" class="search-input" placeholder="🔍 Buscar medicamentos, vitaminas, productos..." id="searchInput" oninput="filterProducts()">
+  </div>
+
+  <div class="categories">
+    <button class="category-btn active" onclick="filterByCategory('todos')">Todos</button>
+    <button class="category-btn" onclick="filterByCategory('analgesicos')">Analgésicos</button>
+    <button class="category-btn" onclick="filterByCategory('antibioticos')">Antibióticos</button>
+    <button class="category-btn" onclick="filterByCategory('vitaminas')">Vitaminas</button>
+    <button class="category-btn" onclick="filterByCategory('digestivos')">Digestivos</button>
+    <button class="category-btn" onclick="filterByCategory('respiratorios')">Respiratorios</button>
+    <button class="category-btn" onclick="filterByCategory('dermatologicos')">Dermatológicos</button>
+  </div>
+
+  <div class="container">
+    <h2 class="section-title">Catálogo de Productos</h2>
+    <div class="products-grid" id="productsGrid"></div>
+
+    <div class="contact-section">
+      <div class="contact-header">
+        <h2 class="section-title">¿Necesitas Ayuda?</h2>
+        <p class="contact-subtitle">Estamos aquí para atenderte. Contáctanos por cualquiera de estos medios o envíanos un mensaje directo.</p>
+      </div>
+      
+      <div class="contact-grid">
+        <a href="tel:+15551234567" class="contact-card contact-card-clickable">
+          <div class="contact-icon-wrapper">
+            <div class="contact-icon">📞</div>
+          </div>
+          <div class="contact-title">Llámanos</div>
+          <div class="contact-info">+1 (555) 123-4567</div>
+          <div class="contact-action">Llamar ahora →</div>
+        </a>
+        
+        <a href="mailto:contacto@farmaciadigital.com" class="contact-card contact-card-clickable">
+          <div class="contact-icon-wrapper">
+            <div class="contact-icon">📧</div>
+          </div>
+          <div class="contact-title">Escríbenos</div>
+          <div class="contact-info">contacto@farmaciadigital.com</div>
+          <div class="contact-action">Enviar email →</div>
+        </a>
+        
+        <a href="https://maps.google.com/?q=Av.+Principal+123" target="_blank" class="contact-card contact-card-clickable">
+          <div class="contact-icon-wrapper">
+            <div class="contact-icon">📍</div>
+          </div>
+          <div class="contact-title">Visítanos</div>
+          <div class="contact-info">Av. Principal 123, Ciudad</div>
+          <div class="contact-action">Ver en mapa →</div>
+        </a>
+        
+        <div class="contact-card contact-card-info">
+          <div class="contact-icon-wrapper">
+            <div class="contact-icon">🕐</div>
+          </div>
+          <div class="contact-title">Horario de Atención</div>
+          <div class="contact-schedule">
+            <div class="schedule-item">
+              <span class="schedule-day">Lunes - Viernes</span>
+              <span class="schedule-time">8:00 AM - 8:00 PM</span>
+            </div>
+            <div class="schedule-item">
+              <span class="schedule-day">Sábados</span>
+              <span class="schedule-time">9:00 AM - 6:00 PM</span>
+            </div>
+            <div class="schedule-item">
+              <span class="schedule-day">Domingos</span>
+              <span class="schedule-time">Cerrado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form-section">
+        <h3 class="form-title">Envíanos un Mensaje</h3>
+        <p class="form-subtitle">¿Tienes alguna pregunta? Completa el formulario y te responderemos lo antes posible.</p>
+        
+        <form class="contact-form" action="https://formsubmit.co/dionisgomez28@gmail.com" method="POST" id="contactForm">
+          <input type="hidden" name="_subject" value="Nuevo mensaje de contacto - Farmacia Digital">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="https://leandrojosegomez.github.io/Farmacia-Digital/modules/usuario-dashboard.html">
+          <input type="hidden" name="_autoresponse" value="Gracias por contactarnos. Hemos recibido tu mensaje y te responderemos pronto.">
+          <input type="text" name="_honey" style="display:none">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contactName">Nombre completo</label>
+              <input type="text" id="contactName" name="Nombre" placeholder="Tu nombre" required>
+            </div>
+            <div class="form-group">
+              <label for="contactEmail">Correo electrónico</label>
+              <input type="email" id="contactEmail" name="Email" placeholder="tu@email.com" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contactPhone">Teléfono (opcional)</label>
+              <input type="tel" id="contactPhone" name="Teléfono" placeholder="+1 (555) 123-4567">
+            </div>
+            <div class="form-group">
+              <label for="contactSubject">Asunto</label>
+              <select id="contactSubject" name="Asunto" required>
+                <option value="">Selecciona un asunto</option>
+                <option value="Consulta general">Consulta general</option>
+                <option value="Información de producto">Información de producto</option>
+                <option value="Estado de pedido">Estado de pedido</option>
+                <option value="Reclamo o sugerencia">Reclamo o sugerencia</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="contactMessage">Mensaje</label>
+            <textarea id="contactMessage" name="Mensaje" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+          </div>
+          
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="btn-text">Enviar Mensaje</span>
+            <span class="btn-icon">✉️</span>
+          </button>
+        </form>
+        
+        
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="alert" class="alert"></div>
+
+  <div id="cartModal" class="cart-modal">
+    <div class="cart-content">
+        <div class="cart-header">
+            <h2>🛒 Mi Carrito</h2>
+            <button class="close-cart" onclick="closeCart()">×</button>
+        </div>
+        
+        <div class="carrito-vacio" id="carritoVacio">
+            <div class="empty-cart-icon">🛒</div>
+            <p>Tu carrito está vacío</p>
+        </div>
+        
+        <div class="carrito-productos" id="carritoProductos">
+            <!-- Los productos se cargarán aquí dinámicamente -->
+        </div>
+        
+        <div class="carrito-acciones" id="carritoAcciones">
+            <div class="carrito-acciones-izquierda">
+                <button class="carrito-acciones-vaciar" id="vaciarCarrito">Vaciar carrito</button>
+            </div>
+            <div class="carrito-acciones-derecha">
+                <div class="carrito-acciones-total">
+                    <p>Total:</p>
+                    <p id="totalAmount">$0.00</p>
+                </div>
+                <button class="carrito-acciones-comprar" id="comprarAhora">Comprar ahora</button>
+            </div>
+        </div>
+        
+        <div class="carrito-comprado disabled" id="carritoComprado">
+            <div class="success-icon">✓</div>
+            <p>¡Compra realizada con éxito!</p>
+            <p class="success-message">Gracias por tu compra en Farmacia Digital</p>
+        </div>
+    </div>
+</div>
+
+  <script>
+    const products = [
+        { id: 1, name: "Paracetamol 500mg", category: "analgesicos", price: 5.99, description: "Alivio efectivo del dolor y fiebre", icon: "💊" },
+        { id: 2, name: "Ibuprofeno 400mg", category: "analgesicos", price: 7.50, description: "Antiinflamatorio y analgésico", icon: "💊" },
+        { id: 3, name: "Amoxicilina 500mg", category: "antibioticos", price: 12.99, description: "Antibiótico de amplio espectro", icon: "💉" },
+        { id: 4, name: "Vitamina C 1000mg", category: "vitaminas", price: 8.99, description: "Fortalece el sistema inmunológico", icon: "🍊" },
+        { id: 5, name: "Complejo B", category: "vitaminas", price: 10.50, description: "Energía y vitalidad diaria", icon: "⚡" },
+        { id: 6, name: "Omeprazol 20mg", category: "digestivos", price: 9.99, description: "Protector gástrico efectivo", icon: "🫀" },
+        { id: 7, name: "Ranitidina 150mg", category: "digestivos", price: 6.50, description: "Reduce la acidez estomacal", icon: "🫀" },
+        { id: 8, name: "Loratadina 10mg", category: "respiratorios", price: 5.99, description: "Antihistamínico para alergias", icon: "🌬️" },
+        { id: 9, name: "Jarabe para la tos", category: "respiratorios", price: 8.50, description: "Alivio rápido de la tos", icon: "🍯" },
+        { id: 10, name: "Crema Hidratante", category: "dermatologicos", price: 11.99, description: "Hidratación profunda de la piel", icon: "🧴" },
+        { id: 11, name: "Protector Solar SPF 50", category: "dermatologicos", price: 15.99, description: "Protección UV avanzada", icon: "☀️" },
+        { id: 12, name: "Aspirina 100mg", category: "analgesicos", price: 4.99, description: "Prevención cardiovascular", icon: "❤️" },
+        { id: 13, name: "Vitamina D3", category: "vitaminas", price: 12.50, description: "Salud ósea y muscular", icon: "🦴" },
+        { id: 14, name: "Azitromicina 500mg", category: "antibioticos", price: 18.99, description: "Tratamiento de infecciones", icon: "💉" },
+        { id: 15, name: "Gel Antibacterial", category: "dermatologicos", price: 3.99, description: "Higiene y protección", icon: "🧼" },
+        // ... (tus productos actuales se mantienen igual)
+    ];
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let currentCategory = 'todos';
+
+    // Funciones de productos (se mantienen igual)
+    function displayProducts(productsToShow) {
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = '';
+
+        productsToShow.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-image">${product.icon}</div>
+                <span class="product-category">${product.category}</span>
+                <div class="product-name">${product.name}</div>
+                <div class="product-description">${product.description}</div>
+                <div class="product-footer">
+                    <div class="product-price">$${product.price.toFixed(2)}</div>
+                    <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Agregar</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterByCategory(category) {
+        currentCategory = category;
+        
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        const filtered = category === 'todos' 
+            ? products 
+            : products.filter(p => p.category === category);
+        
+        displayProducts(filtered);
+    }
+
+    function filterProducts() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        
+        let filtered = currentCategory === 'todos' 
+            ? products 
+            : products.filter(p => p.category === currentCategory);
+        
+        if (searchTerm) {
+            filtered = filtered.filter(p => 
+                p.name.toLowerCase().includes(searchTerm) || 
+                p.description.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        displayProducts(filtered);
+    }
+
+    // ===== NUEVO CARRITO MEJORADO =====
+    function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        
+        if (cart.some(item => item.id === productId)) {
+            cart.find(item => item.id === productId).cantidad++;
+        } else {
+            const productForCart = {...product};
+            productForCart.cantidad = 1;
+            cart.push(productForCart);
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showAlert(`✓ ${product.name} agregado al carrito`);
+    }
+
+    function updateCartCount() {
+        document.getElementById('cartCount').textContent = cart.reduce((acc, item) => acc + item.cantidad, 0);
+    }
+
+    function viewCart() {
+        const modal = document.getElementById('cartModal');
+        mostrarCarrito();
+        modal.classList.add('show');
+    }
+
+    function closeCart() {
+        document.getElementById('cartModal').classList.remove('show');
+    }
+
+    function mostrarCarrito() {
+        const carritoVacio = document.getElementById('carritoVacio');
+        const carritoProductos = document.getElementById('carritoProductos');
+        const carritoAcciones = document.getElementById('carritoAcciones');
+        const carritoComprado = document.getElementById('carritoComprado');
+
+        carritoProductos.innerHTML = '';
+
+        if (cart.length === 0) {
+            carritoVacio.classList.remove('disabled');
+            carritoAcciones.classList.add('disabled');
+            carritoComprado.classList.add('disabled');
+            return;
+        }
+
+        carritoVacio.classList.add('disabled');
+        carritoAcciones.classList.remove('disabled');
+        carritoComprado.classList.add('disabled');
+
+        cart.forEach((producto, index) => {
+            const div = document.createElement('div');
+            div.className = 'carrito-producto';
+            div.innerHTML = `
+                <div class="carrito-producto-info">
+                    <div class="carrito-producto-icon">${producto.icon}</div>
+                    <div class="carrito-producto-detalles">
+                        <div class="carrito-producto-nombre">${producto.name}</div>
+                        <div class="carrito-producto-descripcion">${producto.description}</div>
+                    </div>
+                </div>
+                <div class="carrito-producto-cantidad">
+                    <small>Cantidad</small>
+                    <div class="cantidad-controls">
+                        <button class="cantidad-btn disminuir" data-index="${index}">-</button>
+                        <span class="cantidad-numero">${producto.cantidad}</span>
+                        <button class="cantidad-btn aumentar" data-index="${index}">+</button>
+                    </div>
+                </div>
+                <div class="carrito-producto-precio">
+                    <small>Precio unitario</small>
+                    <p>$${producto.price.toFixed(2)}</p>
+                </div>
+                <div class="carrito-producto-subtotal">
+                    <small>Subtotal</small>
+                    <p>$${(producto.price * producto.cantidad).toFixed(2)}</p>
+                </div>
+                <button class="carrito-producto-eliminar" data-id="${producto.id}">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            `;
+            carritoProductos.appendChild(div);
+        });
+
+        actualizarEventosCarrito();
+        actualizarTotalCarrito();
+    }
+
+    function actualizarEventosCarrito() {
+        // Eliminar producto
+        document.querySelectorAll('.carrito-producto-eliminar').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const id = parseInt(e.currentTarget.dataset.id);
+                const producto = cart.find(p => p.id === id);
+                
+                Swal.fire({
+                    title: '¿Eliminar producto?',
+                    text: `¿Estás seguro de que quieres eliminar ${producto.name} del carrito?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00A8E8',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        cart = cart.filter(p => p.id !== id);
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        updateCartCount();
+                        mostrarCarrito();
+                        showAlert(`✓ ${producto.name} eliminado del carrito`);
+                    }
+                });
+            });
+        });
+
+        // Controles de cantidad
+        document.querySelectorAll('.cantidad-btn.aumentar').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const index = parseInt(e.currentTarget.dataset.index);
+                cart[index].cantidad++;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                mostrarCarrito();
+            });
+        });
+
+        document.querySelectorAll('.cantidad-btn.disminuir').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const index = parseInt(e.currentTarget.dataset.index);
+                if (cart[index].cantidad > 1) {
+                    cart[index].cantidad--;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+                    mostrarCarrito();
+                }
+            });
+        });
+    }
+
+    function actualizarTotalCarrito() {
+        const total = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+        document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Vaciar carrito
+    document.getElementById('vaciarCarrito').addEventListener('click', () => {
+        if (cart.length === 0) return;
+
+        Swal.fire({
+            title: '¿Vaciar carrito?',
+            text: 'Se eliminarán todos los productos del carrito',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#00A8E8',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, vaciar carrito',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                cart = [];
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                mostrarCarrito();
+                showAlert('✓ Carrito vaciado');
+            }
+        });
+    });
+
+    // Comprar ahora
+    document.getElementById('comprarAhora').addEventListener('click', () => {
+        if (cart.length === 0) return;
+
+        let resumen = cart.map(p => {
+            return `${p.name} - ${p.cantidad} unidad(es) - $${(p.price * p.cantidad).toFixed(2)}`;
+        }).join('\n');
+
+        const total = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+
+        Swal.fire({
+            title: 'Confirmar compra',
+            html: `
+                <div style="text-align: left;">
+                    <p><strong>Resumen de tu compra:</strong></p>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                        ${cart.map(p => 
+                            `<div style="margin-bottom: 8px;">
+                                ${p.icon} ${p.name} - ${p.cantidad} x $${p.price.toFixed(2)} = <strong>$${(p.price * p.cantidad).toFixed(2)}</strong>
+                            </div>`
+                        ).join('')}
+                    </div>
+                    <p style="font-size: 1.2em; font-weight: bold; color: #00A8E8;">
+                        Total: $${total.toFixed(2)}
+                    </p>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#00A8E8',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, confirmar compra',
+            cancelButtonText: 'Seguir comprando'
+        }).then(result => {
+            if (result.isConfirmed) {
+                cart = [];
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                mostrarCarrito();
+                
+                document.getElementById('carritoComprado').classList.remove('disabled');
+                document.getElementById('carritoAcciones').classList.add('disabled');
+                
+                setTimeout(() => {
+                    closeCart();
+                }, 2000);
+                
+                showAlert('✓ ¡Compra realizada con éxito!');
+            }
+        });
+    });
+
+    function showAlert(message) {
+        const alert = document.getElementById('alert');
+        alert.textContent = message;
+        alert.className = 'alert alert-success show';
+        
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 3000);
+    }
+
+    function logout() {
+        localStorage.removeItem('loggedUser');
+        window.location.href = '../index.html';
+    }
+
+    // Event listeners
+    document.getElementById('cartModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeCart();
+        }
+    });
+
+    window.onload = function() {
+        const user = JSON.parse(localStorage.getItem('loggedUser'));
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        document.getElementById('userName').textContent = user.name.split(' ')[0];
+        displayProducts(products);
+        updateCartCount();
+        
+        // Inicializar eventos del carrito
+        document.getElementById('vaciarCarrito').addEventListener('click', () => {});
+        document.getElementById('comprarAhora').addEventListener('click', () => {});
+        
+        // Manejo del formulario de contacto
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        // Verificar si hay mensaje de éxito en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mensaje') === 'enviado') {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Mensaje enviado!',
+                text: 'Gracias por contactarnos. Te responderemos pronto.',
+                confirmButtonColor: '#00A8E8'
+            });
+            // Limpiar la URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        
+        // Agregar estado de carga al enviar el formulario
+        contactForm.addEventListener('submit', function(e) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="btn-text">Enviando...</span><span class="btn-icon">⏳</span>';
+            
+            // Mostrar alerta de envío
+            Swal.fire({
+                title: 'Enviando mensaje...',
+                text: 'Por favor espera un momento',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+    };
+  </script>
+
+</body>
+</html>

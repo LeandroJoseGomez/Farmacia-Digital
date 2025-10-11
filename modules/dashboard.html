@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Farmacia Digital</title>
+  <link rel="icon" type="image/png" href="public/logo2.png">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+<body>
+
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <img src="../assets/images/logo2.png" alt="Farmacia Digital" class="navbar-logo">
+      Farmacia Digital
+    </a>
+    <div class="navbar-user">
+      <div class="user-info">
+        <div class="user-name" id="userName"></div>
+        <div class="user-email" id="userEmail"></div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="welcome-section">
+      <h1>¡Bienvenido a Farmacia Digital!</h1>
+      <p>Gestiona tu salud de manera inteligente</p>
+    </div>
+
+    <div class="modules-grid">
+      <div class="module-card" onclick="navigateTo('perfil.html')">
+        <div class="module-icon">👤</div>
+        <div class="module-title">Perfil de Paciente</div>
+        <div class="module-description">
+          Gestiona tu información personal, historial médico y preferencias de salud de forma segura.
+        </div>
+        <a href="perfil.html" class="module-link">Acceder →</a>
+      </div>
+
+      <div class="module-card" onclick="navigateTo('gestion.html')">
+        <div class="module-icon">💊</div>
+        <div class="module-title">Gestión de Medicamentos</div>
+        <div class="module-description">
+          Registra y administra tus medicamentos, recetas y tratamientos con recordatorios inteligentes.
+        </div>
+        <a href="gestion.html" class="module-link">Acceder →</a>
+      </div>
+
+      <div class="module-card" onclick="navigateTo('reportes.html')">
+        <div class="module-icon">📊</div>
+        <div class="module-title">Análisis de Salud IA</div>
+        <div class="module-description">
+          Visualiza estadísticas de salud y recibe recomendaciones personalizadas generadas con IA.
+        </div>
+        <a href="reportes.html" class="module-link">Acceder →</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Verificar autenticación
+    const loggedUser = localStorage.getItem("loggedUser");
+    
+    if (!loggedUser) {
+      window.location.href = "index.html";
+    } else {
+      const user = JSON.parse(loggedUser);
+      document.getElementById("userName").textContent = user.name;
+      document.getElementById("userEmail").textContent = user.email;
+    }
+
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+        localStorage.removeItem("loggedUser");
+        window.location.href = "../index.html";
+      }
+    }
+  </script>
+
+</body>
+</html>
