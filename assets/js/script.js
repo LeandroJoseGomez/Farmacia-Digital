@@ -184,3 +184,86 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Enter') register();
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+function toggleForms() {
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+  registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+}
+
+async function register() {
+  const nombre = document.getElementById('registerName').value;
+  const correo = document.getElementById('registerEmail').value;
+  const contrasena = document.getElementById('registerPassword').value;
+  const alert = document.getElementById('registerAlert');
+
+  if (!nombre || !correo || !contrasena) {
+    alert.innerHTML = "Completa todos los campos.";
+    return;
+  }
+
+  const data = new URLSearchParams();
+  data.append("nombre", nombre);
+  data.append("correo", correo);
+  data.append("contrasena", contrasena);
+
+  const response = await fetch('php/registro.php', {
+    method: 'POST',
+    body: data
+  });
+
+  const result = await response.text();
+
+  if (result === "ok") {
+    alert.innerHTML = "Registro exitoso. Ahora inicia sesión.";
+    toggleForms();
+  } else if (result === "existe") {
+    alert.innerHTML = "El correo ya está registrado.";
+  } else {
+    alert.innerHTML = "Error al registrarse.";
+  }
+}
+
+async function login() {
+  const correo = document.getElementById('loginEmail').value;
+  const contrasena = document.getElementById('loginPassword').value;
+  const alert = document.getElementById('loginAlert');
+
+  if (!correo || !contrasena) {
+    alert.innerHTML = "Completa todos los campos.";
+    return;
+  }
+
+  const data = new URLSearchParams();
+  data.append("correo", correo);
+  data.append("contrasena", contrasena);
+
+  const response = await fetch('php/login.php', {
+    method: 'POST',
+    body: data
+  });
+
+  const result = await response.text();
+
+  if (result === "ok") {
+    alert.innerHTML = "Acceso exitoso. Redirigiendo...";
+    // Redirige a tu página principal
+    window.location.href = "dashboard.html";
+  } else if (result === "incorrecto") {
+    alert.innerHTML = "Contraseña incorrecta.";
+  } else {
+    alert.innerHTML = "Usuario no encontrado.";
+  }
+}

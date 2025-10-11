@@ -1,0 +1,30 @@
+<?php
+include 'conexion.php';
+
+$nombre = $_POST['nombre'];
+$correo = $_POST['correo'];
+$contrasena = password_hash($_POST['contrasena'], PASSWORD_BCRYPT);
+
+// Verificar si el correo ya existe
+$sql_check = "SELECT id FROM usuarios WHERE correo = ?";
+$stmt = $conn->prepare($sql_check);
+$stmt->bind_param("s", $correo);
+$stmt->execute();
+$stmt->store_result();
+
+if ($stmt->num_rows > 0) {
+    echo "existe";
+} else {
+    $sql = "INSERT INTO usuarios (nombre, correo, contrasena) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $nombre, $correo, $contrasena);
+    if ($stmt->execute()) {
+        echo "ok";
+    } else {
+        echo "error";
+    }
+}
+
+$stmt->close();
+$conn->close();
+?>
