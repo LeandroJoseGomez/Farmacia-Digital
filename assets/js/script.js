@@ -80,47 +80,36 @@ function checkPasswordStrength() {
     }
 }
 
-function login() {
-    clearAlerts();
+async function login() {
+  const correo = document.getElementById('loginEmail').value;
+  const contrasena = document.getElementById('loginPassword').value;
+  const alert = document.getElementById('loginAlert');
 
-    const emailOrUsername = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
+  if (!correo || !contrasena) {
+    alert.innerHTML = "Completa todos los campos.";
+    return;
+  }
 
-    if (!emailOrUsername || !password) {
-        showAlert("loginAlert", "❌ Por favor, completa todos los campos", "error");
-        if (!emailOrUsername) document.getElementById("loginEmail").classList.add('error-input');
-        if (!password) document.getElementById("loginPassword").classList.add('error-input');
-        return;
-    }
+  const data = new URLSearchParams();
+  data.append("correo", correo);
+  data.append("contrasena", contrasena);
 
-    if (emailOrUsername === "admin" && password === "12345") {
-        const adminUser = {
-            name: "Administrador",
-            email: "admin",
-            role: "admin"
-        };
-        localStorage.setItem("loggedUser", JSON.stringify(adminUser));
-        showAlert("loginAlert", "✓ Bienvenido Administrador. Redirigiendo...", "success");
-        setTimeout(() => {
-            window.location.href = "modules/dashboard.html";
-        }, 1000);
-        return;
-    }
+  const response = await fetch('php/login.php', {
+    method: 'POST',
+    body: data
+  });
 
-    const users = getUsers();
-    const user = users.find(u => u.email === emailOrUsername && u.password === password);
+  const result = await response.text();
 
-    if (user) {
-        localStorage.setItem("loggedUser", JSON.stringify(user));
-        showAlert("loginAlert", "✓ Inicio de sesión exitoso. Redirigiendo...", "success");
-        setTimeout(() => {
-            window.location.href = "modules/usuario-dashboard.html";
-        }, 1000);
-    } else {
-        showAlert("loginAlert", "❌ Usuario o contraseña incorrectos", "error");
-        document.getElementById("loginEmail").classList.add('error-input');
-        document.getElementById("loginPassword").classList.add('error-input');
-    }
+  if (result === "ok") {
+    alert.innerHTML = "Acceso exitoso. Redirigiendo...";
+    // Redirige a tu página principal
+    window.location.href = "dashboard.html";
+  } else if (result === "incorrecto") {
+    alert.innerHTML = "Contraseña incorrecta.";
+  } else {
+    alert.innerHTML = "Usuario no encontrado.";
+  }
 }
 
 function register() {
@@ -236,34 +225,3 @@ async function register() {
   }
 }
 
-async function login() {
-  const correo = document.getElementById('loginEmail').value;
-  const contrasena = document.getElementById('loginPassword').value;
-  const alert = document.getElementById('loginAlert');
-
-  if (!correo || !contrasena) {
-    alert.innerHTML = "Completa todos los campos.";
-    return;
-  }
-
-  const data = new URLSearchParams();
-  data.append("correo", correo);
-  data.append("contrasena", contrasena);
-
-  const response = await fetch('php/login.php', {
-    method: 'POST',
-    body: data
-  });
-
-  const result = await response.text();
-
-  if (result === "ok") {
-    alert.innerHTML = "Acceso exitoso. Redirigiendo...";
-    // Redirige a tu página principal
-    window.location.href = "dashboard.html";
-  } else if (result === "incorrecto") {
-    alert.innerHTML = "Contraseña incorrecta.";
-  } else {
-    alert.innerHTML = "Usuario no encontrado.";
-  }
-}
