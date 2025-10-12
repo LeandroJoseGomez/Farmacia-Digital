@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Farmacia Digital</title>
-  <link rel="icon" type="image/png" href="public/logo2.png">
+  <link rel="icon" type="image/png" href="../assets/images/logo2.png">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
 <body>
 
@@ -59,25 +59,37 @@
   </div>
 
   <script>
-    // Verificar autenticación
-    const loggedUser = localStorage.getItem("loggedUser");
-    
-    if (!loggedUser) {
-      window.location.href = "index.html";
-    } else {
-      const user = JSON.parse(loggedUser);
-      document.getElementById("userName").textContent = user.name;
-      document.getElementById("userEmail").textContent = user.email;
-    }
+    // 🔹 Obtener datos del usuario desde la sesión PHP
+    fetch('php/session.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === "ok") {
+          document.getElementById("userName").textContent = data.nombre;
+          document.getElementById("userEmail").textContent = data.correo;
+        } else {
+          // No hay sesión activa → redirige al login
+          window.location.href = "../index.html";
+        }
+      })
+      .catch(err => {
+        console.error("Error al cargar sesión:", err);
+        window.location.href = "../index.html";
+      });
 
     function navigateTo(page) {
       window.location.href = page;
     }
 
+    // 🔹 Cerrar sesión
     function logout() {
       if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-        localStorage.removeItem("loggedUser");
-        window.location.href = "../index.html";
+        fetch('../php/logout.php', { method: 'POST' })
+          .then(res => res.text())
+          .then(res => {
+            if (res === "ok") {
+              window.location.href = "../index.html";
+            }
+          });
       }
     }
   </script>

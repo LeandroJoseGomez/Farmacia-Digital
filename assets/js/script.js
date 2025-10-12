@@ -115,7 +115,7 @@ async function login() {
     if (result === "ok") {
       showAlert('loginAlert', 'Acceso exitoso. Redirigiendo...', 'success');
       setTimeout(() => {
-        window.location.href = "dashboard.html";
+        window.location.href = "modules/dashboard.html";
       }, 1500);
     } else if (result === "incorrecto") {
       showAlert('loginAlert', 'Contraseña incorrecta.', 'danger');
