@@ -1,12 +1,16 @@
 <?php
-$host = "sql211.infinityfree.com";      // o el host del servidor MySQL
-$user = "if0_40139405";     // cambia por tu usuario MySQL
-$pass = "JvRrZIzwFwE";  // cambia por tu contraseña MySQL
-$dbname = "if0_40139405_FarmaciaDigitalBD"; // tu base de datos
+$host = "localhost";        
+$user = "root";             
+$pass = "";                 
+$dbname = "farmaciadigitalbd"; 
 
-$conn = new mysqli($host, $user, $pass, $dbname);
+// Intentar la conexión sin el 'die' inmediatamente, solo para la prueba
+$conn = new mysqli($host, $user, $pass, $dbname, 3306);
 
 if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    // Si la conexión falla, muestra el error de conexión y detiene todo.
+    echo "FalloCriticoDB: " . $conn->connect_error;
+    exit(); // Detenemos la ejecución
 }
+// Si la conexión es exitosa, no imprime nada. Los demás scripts continuarán.
 ?>
