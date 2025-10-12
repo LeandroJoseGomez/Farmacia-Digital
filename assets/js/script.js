@@ -1,177 +1,195 @@
-
+// ===== Manejo de usuarios (solo si usas localStorage) =====
 function getUsers() {
-    const stored = localStorage.getItem('users');
-    if (!stored) {
-        localStorage.setItem('users', JSON.stringify([]));
-        return [];
-    }
-    return JSON.parse(stored);
+  const stored = localStorage.getItem('users');
+  if (!stored) {
+    localStorage.setItem('users', JSON.stringify([]));
+    return [];
+  }
+  return JSON.parse(stored);
 }
 
 function saveUsers(users) {
-    localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('users', JSON.stringify(users));
 }
 
+// ===== Mostrar/Ocultar formularios =====
 function toggleForms() {
-    const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
+  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("registerForm");
 
-    if (loginForm.style.display === "none") {
-        loginForm.style.display = "block";
-        registerForm.style.display = "none";
-        clearAlerts();
-    } else {
-        loginForm.style.display = "none";
-        registerForm.style.display = "block";
-        clearAlerts();
-    }
+  if (!loginForm || !registerForm) return;
+
+  if (loginForm.style.display === "none") {
+    loginForm.style.display = "block";
+    registerForm.style.display = "none";
+  } else {
+    loginForm.style.display = "none";
+    registerForm.style.display = "block";
+  }
+  clearAlerts();
 }
 
-function showAlert(elementId, message, type) {
-    const alert = document.getElementById(elementId);
-    alert.textContent = message;
-    alert.className = `alert alert-${type} show`;
+// ===== Manejo de alertas =====
+function showAlert(elementId, message, type = "info") {
+  const alert = document.getElementById(elementId);
+  if (!alert) return;
 
-    setTimeout(() => {
-        alert.classList.remove('show');
-    }, 5000);
+  alert.textContent = message;
+  alert.className = `alert alert-${type} show`;
+
+  setTimeout(() => {
+    alert.classList.remove('show');
+  }, 5000);
 }
 
 function clearAlerts() {
-    document.querySelectorAll('.alert').forEach(alert => {
-        alert.classList.remove('show');
-    });
-    document.querySelectorAll('input, select').forEach(input => {
-        input.classList.remove('error-input');
-    });
+  document.querySelectorAll('.alert').forEach(alert => {
+    alert.classList.remove('show');
+  });
+  document.querySelectorAll('input, select').forEach(input => {
+    input.classList.remove('error-input');
+  });
 }
 
+// ===== Validaciones =====
 function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
 }
 
 function checkPasswordStrength() {
-    const password = document.getElementById("registerPassword").value;
-    const strengthDiv = document.getElementById("passwordStrength");
+  const password = document.getElementById("registerPassword").value;
+  const strengthDiv = document.getElementById("passwordStrength");
+  if (!strengthDiv) return;
 
-    if (password.length === 0) {
-        strengthDiv.classList.remove('show');
-        return;
-    }
+  if (password.length === 0) {
+    strengthDiv.classList.remove('show');
+    return;
+  }
 
-    strengthDiv.classList.add('show');
+  strengthDiv.classList.add('show');
 
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
-    if (password.match(/[0-9]/)) strength++;
-    if (password.match(/[^a-zA-Z0-9]/)) strength++;
+  let strength = 0;
+  if (password.length >= 8) strength++;
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+  if (/\d/.test(password)) strength++;
+  if (/[^a-zA-Z0-9]/.test(password)) strength++;
 
-    if (strength <= 1) {
-        strengthDiv.textContent = "⚠️ Contraseña débil";
-        strengthDiv.className = "password-strength show strength-weak";
-    } else if (strength <= 2) {
-        strengthDiv.textContent = "⚡ Contraseña media";
-        strengthDiv.className = "password-strength show strength-medium";
-    } else {
-        strengthDiv.textContent = "✓ Contraseña fuerte";
-        strengthDiv.className = "password-strength show strength-strong";
-    }
+  if (strength <= 1) {
+    strengthDiv.textContent = "⚠️ Contraseña débil";
+    strengthDiv.className = "password-strength show strength-weak";
+  } else if (strength === 2) {
+    strengthDiv.textContent = "⚡ Contraseña media";
+    strengthDiv.className = "password-strength show strength-medium";
+  } else {
+    strengthDiv.textContent = "✓ Contraseña fuerte";
+    strengthDiv.className = "password-strength show strength-strong";
+  }
 }
 
+// ===== LOGIN =====
 async function login() {
-  const correo = document.getElementById('loginEmail').value;
-  const contrasena = document.getElementById('loginPassword').value;
+  const correo = document.getElementById('loginEmail').value.trim();
+  const contrasena = document.getElementById('loginPassword').value.trim();
   const alert = document.getElementById('loginAlert');
 
+  clearAlerts();
+
   if (!correo || !contrasena) {
-    alert.innerHTML = "Completa todos los campos.";
+    showAlert('loginAlert', 'Completa todos los campos.', 'warning');
     return;
   }
 
-  const data = new URLSearchParams();
-  data.append("correo", correo);
-  data.append("contrasena", contrasena);
+  try {
+    const data = new URLSearchParams();
+    data.append("correo", correo);
+    data.append("contrasena", contrasena);
 
-  const response = await fetch('php/login.php', {
-    method: 'POST',
-    body: data
-  });
+    const response = await fetch('php/login.php', {
+      method: 'POST',
+      body: data
+    });
 
-  const result = await response.text();
+    const result = (await response.text()).trim();
 
-  if (result === "ok") {
-    alert.innerHTML = "Acceso exitoso. Redirigiendo...";
-    // Redirige a tu página principal
-    window.location.href = "dashboard.html";
-  } else if (result === "incorrecto") {
-    alert.innerHTML = "Contraseña incorrecta.";
-  } else {
-    alert.innerHTML = "Usuario no encontrado.";
+    if (result === "ok") {
+      showAlert('loginAlert', 'Acceso exitoso. Redirigiendo...', 'success');
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 1500);
+    } else if (result === "incorrecto") {
+      showAlert('loginAlert', 'Contraseña incorrecta.', 'danger');
+    } else {
+      showAlert('loginAlert', 'Usuario no encontrado.', 'danger');
+    }
+
+  } catch (error) {
+    showAlert('loginAlert', 'Error de conexión con el servidor.', 'danger');
+    console.error(error);
   }
 }
 
+// ===== REGISTRO =====
 async function register() {
-  const nombre = document.getElementById('registerName').value;
-  const correo = document.getElementById('registerEmail').value;
-  const contrasena = document.getElementById('registerPassword').value;
+  const nombre = document.getElementById('registerName').value.trim();
+  const correo = document.getElementById('registerEmail').value.trim();
+  const contrasena = document.getElementById('registerPassword').value.trim();
   const alert = document.getElementById('registerAlert');
 
+  clearAlerts();
+
   if (!nombre || !correo || !contrasena) {
-    alert.innerHTML = "Completa todos los campos.";
+    showAlert('registerAlert', 'Completa todos los campos.', 'warning');
     return;
   }
 
-  const data = new URLSearchParams();
-  data.append("nombre", nombre);
-  data.append("correo", correo);
-  data.append("contrasena", contrasena);
+  if (!validateEmail(correo)) {
+    showAlert('registerAlert', 'Correo inválido.', 'warning');
+    return;
+  }
 
-  const response = await fetch('php/registro.php', {
-    method: 'POST',
-    body: data
-  });
+  try {
+    const data = new URLSearchParams();
+    data.append("nombre", nombre);
+    data.append("correo", correo);
+    data.append("contrasena", contrasena);
 
-  const result = await response.text();
+    const response = await fetch('php/registro.php', {
+      method: 'POST',
+      body: data
+    });
 
-  if (result === "ok") {
-    alert.innerHTML = "Registro exitoso. Ahora inicia sesión.";
-    toggleForms();
-  } else if (result === "existe") {
-    alert.innerHTML = "El correo ya está registrado.";
-  } else {
-    alert.innerHTML = "Error al registrarse.";
+    const result = (await response.text()).trim();
+
+    if (result === "ok") {
+      showAlert('registerAlert', 'Registro exitoso. Ahora inicia sesión.', 'success');
+      setTimeout(() => toggleForms(), 1000);
+    } else if (result === "existe") {
+      showAlert('registerAlert', 'El correo ya está registrado.', 'danger');
+    } else {
+      showAlert('registerAlert', 'Error al registrarse.', 'danger');
+    }
+
+  } catch (error) {
+    showAlert('registerAlert', 'Error de conexión con el servidor.', 'danger');
+    console.error(error);
   }
 }
 
+// ===== EVENTOS =====
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('loginPassword').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') login();
-    });
+  const loginPassword = document.getElementById('loginPassword');
+  const registerPassword = document.getElementById('registerPassword');
 
-    document.getElementById('registerPassword').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') register();
+  if (loginPassword) {
+    loginPassword.addEventListener('keypress', e => {
+      if (e.key === 'Enter') login();
     });
+  }
+
+  if (registerPassword) {
+    registerPassword.addEventListener('keypress', e => {
+      if (e.key === 'Enter') register();
+    });
+  }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-function toggleForms() {
-  const loginForm = document.getElementById('loginForm');
-  const registerForm = document.getElementById('registerForm');
-  loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
-  registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
-}
-
-
-
