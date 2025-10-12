@@ -112,86 +112,6 @@ async function login() {
   }
 }
 
-function register() {
-    clearAlerts();
-
-    const name = document.getElementById("registerName").value.trim();
-    const email = document.getElementById("registerEmail").value.trim();
-    const password = document.getElementById("registerPassword").value.trim();
-
-    if (!name || !email || !password) {
-        showAlert("registerAlert", "❌ Por favor, completa todos los campos", "error");
-        if (!name) document.getElementById("registerName").classList.add('error-input');
-        if (!email) document.getElementById("registerEmail").classList.add('error-input');
-        if (!password) document.getElementById("registerPassword").classList.add('error-input');
-        return;
-    }
-
-    if (name.length < 3) {
-        showAlert("registerAlert", "❌ El nombre debe tener al menos 3 caracteres", "error");
-        document.getElementById("registerName").classList.add('error-input');
-        return;
-    }
-
-    if (!validateEmail(email)) {
-        showAlert("registerAlert", "❌ Por favor, ingresa un correo válido", "error");
-        document.getElementById("registerEmail").classList.add('error-input');
-        return;
-    }
-
-    if (password.length < 8) {
-        showAlert("registerAlert", "❌ La contraseña debe tener al menos 8 caracteres", "error");
-        document.getElementById("registerPassword").classList.add('error-input');
-        return;
-    }
-
-    const users = getUsers();
-
-    if (users.find(u => u.email === email)) {
-        showAlert("registerAlert", "❌ Este correo ya está registrado", "error");
-        document.getElementById("registerEmail").classList.add('error-input');
-        return;
-    }
-
-    users.push({ name, email, password, role: "usuario" });
-    saveUsers(users);
-
-    showAlert("registerAlert", "✓ Cuenta creada exitosamente. Redirigiendo al login...", "success");
-
-    setTimeout(() => {
-        toggleForms();
-        document.getElementById("loginEmail").value = email;
-    }, 1500);
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('loginPassword').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') login();
-    });
-
-    document.getElementById('registerPassword').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') register();
-    });
-});
-
-
-
-
-
-
-
-
-
-
-
-
-function toggleForms() {
-  const loginForm = document.getElementById('loginForm');
-  const registerForm = document.getElementById('registerForm');
-  loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
-  registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
-}
-
 async function register() {
   const nombre = document.getElementById('registerName').value;
   const correo = document.getElementById('registerEmail').value;
@@ -224,4 +144,34 @@ async function register() {
     alert.innerHTML = "Error al registrarse.";
   }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('loginPassword').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') login();
+    });
+
+    document.getElementById('registerPassword').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') register();
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+function toggleForms() {
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+  registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+}
+
+
 
