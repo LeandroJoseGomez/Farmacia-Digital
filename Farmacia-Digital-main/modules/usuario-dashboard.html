@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Farmacia Digital</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo2.png">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <img src="../assets/images/logo2.png" alt="Farmacia Digital" class="navbar-logo">
+      Farmacia Digital
+    </a>
+    <div class="navbar-user">
+      <div class="user-info">
+        <div class="user-name" id="userName"></div>
+        <div class="user-email" id="userEmail"></div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="welcome-section">
+      <h1>¡Bienvenido/a!</h1>
+      <p>Tu sesión está activa.</p>
+    </div>
+  </div>
+
+   <script>
+    // 🔹 Obtener datos del usuario desde la sesión PHP
+    // RUTA CORREGIDA: Se agregó '../' para subir al directorio raíz y entrar a 'php/'
+    fetch('../php/session.php') 
+      .then(response => {
+        if (!response.ok) {
+            // Manejo explícito de error para debug
+            console.error(`Error HTTP ${response.status}: La ruta '../php/session.php' es incorrecta o Apache no está activo.`);
+            throw new Error('Server error or file not found.');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === "ok") {
+          document.getElementById("userName").textContent = data.nombre;
+          document.getElementById("userEmail").textContent = data.correo;
+        } else {
+          // No hay sesión activa → redirige al login
+          window.location.href = "../index.html";
+        }
+      })
+      .catch(err => {
+        console.error("Fallo CRÍTICO de Conexión/Sesión:", err.message);
+        window.location.href = "../index.html";
+      });
+
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    // 🔹 Cerrar sesión
+    function logout() {
+      if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+        fetch('../php/logout.php', { method: 'POST' })
+          .then(res => res.text())
+          .then(res => {
+            if (res === "ok") {
+              window.location.href = "../index.html";
+            }
+          })
+          .catch(err => {
+             console.error("Error al cerrar sesión:", err);
+             alert("Hubo un error al intentar cerrar la sesión.");
+          });
+      }
+    }
+  </script>
+
+</body>
+</html>
