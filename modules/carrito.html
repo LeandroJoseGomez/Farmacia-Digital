@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmacia Digital - Carrito de Compras</title>
+  <link rel="icon" type="image/png" href="public/logo2.png">
+  <link rel="stylesheet" href="../assent/css/carrito.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <!-- Header similar al dashboard -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <img src="../assets/images/logo2.png" alt="Farmacia Digital">
+      <h1>Farmacia Digital</h1>
+    </div>
+    <div class="navbar-user">
+      <span class="user-info" id="userName">Usuario</span>
+      <button class="back-btn" onclick="volverAlUsuarioDashboard()">Volver al Inicio</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="page-title">🛒 Carrito de Compras</h1>
+    
+    <!-- Tabla de productos -->
+    <div class="cart-section">
+      <h2 class="section-title">Productos en el Carrito</h2>
+      
+      <div class="carrito-vacio" id="carritoVacio">
+        <div class="empty-cart-icon">🛒</div>
+        <p>Tu carrito está vacío</p>
+        <button class="btn-primary" onclick="volverAlUsuarioDashboard()">Ir a Comprar</button>
+      </div>
+      
+      <div class="carrito-productos" id="carritoProductos">
+        <!-- Los productos se cargarán aquí dinámicamente -->
+      </div>
+      
+      <div class="carrito-acciones" id="carritoAcciones">
+        <div class="carrito-acciones-izquierda">
+          <button class="carrito-acciones-vaciar" id="vaciarCarrito">Vaciar carrito</button>
+        </div>
+        <div class="carrito-acciones-derecha">
+          <div class="carrito-acciones-total">
+            <p>Total:</p>
+            <p id="totalAmount">$0.00</p>
+          </div>
+          <button class="carrito-acciones-comprar" id="procesarCompra">Procesar Compra</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de datos del cliente -->
+    <div id="formularioCliente" class="form-section" style="display: none;">
+      <h2 class="section-title">📋 Datos del Cliente</h2>
+      
+      <form id="formCliente" onsubmit="procesarFormularioCliente(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombreCliente">Nombre completo *</label>
+            <input type="text" id="nombreCliente" required placeholder="Ej: Juan Pérez">
+          </div>
+          
+          <div class="form-group">
+            <label for="telefonoCliente">Teléfono *</label>
+            <input type="tel" id="telefonoCliente" required placeholder="(809) 123-4567">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="direccionCliente">Dirección *</label>
+          <input type="text" id="direccionCliente" required placeholder="Calle, No., Ciudad">
+        </div>
+        
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="usaSeguro" onchange="toggleSeguro()">
+            <span>El cliente usa seguro médico</span>
+          </label>
+        </div>
+        
+        <div id="camposSeguro" class="campos-seguro" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="aseguradora">Aseguradora *</label>
+              <input type="text" id="aseguradora" placeholder="Ej: Seguros Universales">
+            </div>
+            
+            <div class="form-group">
+              <label for="numeroCarnet">No. de Carnet *</label>
+              <input type="text" id="numeroCarnet" placeholder="Ej: 123456789">
+            </div>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-primary">
+          Continuar al Cobro →
+        </button>
+      </form>
+    </div>
+
+    <!-- Pantalla de cobro -->
+    <div id="pantallaCobro" class="cobro-section" style="display: none;">
+      <h2 class="section-title">💰 Pantalla de Cobro</h2>
+      
+      <div class="cobro-container">
+        <div class="resumen-productos-cobro">
+          <h3>Productos</h3>
+          <div id="resumenProductosCobro"></div>
+        </div>
+        
+        <div class="totales-cobro">
+          <div class="total-row-cobro">
+            <span>Subtotal:</span>
+            <span id="totalBrutoCobro">$0.00</span>
+          </div>
+          <div class="total-row-cobro descuento-cobro">
+            <span>Cobertura Seguro:</span>
+            <span id="coberturaCobro">$0.00</span>
+          </div>
+          <div class="total-row-cobro total-final-cobro">
+            <span>TOTAL A PAGAR:</span>
+            <span id="totalNetoCobro">$0.00</span>
+          </div>
+        </div>
+        
+        <div class="pago-section">
+          <div class="form-group">
+            <label for="montoPagado">Monto recibido *</label>
+            <input type="number" id="montoPagado" step="0.01" min="0" 
+                   placeholder="$0.00" oninput="calcularCambio()">
+          </div>
+          
+          <div id="errorPago" class="error-pago" style="display: none;"></div>
+          
+          <div class="cambio-display">
+            <span>Cambio:</span>
+            <span id="cambioCalculado" class="cambio-monto">$0.00</span>
+          </div>
+        </div>
+        
+        <button onclick="confirmarPago()" class="btn-primary btn-confirmar">
+          ✓ Confirmar Pago y Generar Factura
+        </button>
+      </div>
+    </div>
+
+    <!-- Factura -->
+    <div id="facturaSection" class="factura-section" style="display: none;">
+      <h2 class="section-title">📄 Factura Generada</h2>
+      
+      <div id="facturaContenido" class="factura-contenido"></div>
+      
+      <div class="factura-acciones">
+        <button onclick="imprimirFactura()" class="btn-primary">
+          🖨️ Imprimir Factura
+        </button>
+        <button onclick="finalizarCompra()" class="btn-secondary">
+          Finalizar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+
+
+
+
+
+// Variables globales
+let cart = [];
+let clienteData = {};
+let coberturaSeguro = 0.8; // 80% de cobertura
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    cargarCarrito();
+    mostrarCarrito();
+    actualizarTotalCarrito();
+    
+    // Verificar si hay usuario logueado
+    const user = JSON.parse(localStorage.getItem('loggedUser'));
+    if (!user) {
+        window.location.href = '../index.html';
+        return;
+    }
+    
+    document.getElementById('userName').textContent = user.name.split(' ')[0];
+    
+    // Event listeners
+    document.getElementById('vaciarCarrito').addEventListener('click', vaciarCarrito);
+    document.getElementById('procesarCompra').addEventListener('click', procesarCompra);
+});
+
+// Cargar carrito desde localStorage
+function cargarCarrito() {
+    cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    // Asegurarse de que cada producto tenga la propiedad cubiertoPorSeguro
+    cart.forEach(producto => {
+        if (producto.cubiertoPorSeguro === undefined) {
+            // Actualizar la lista de productos cubiertos según tu nuevo dashboard
+            const productosCubiertos = [
+                'Acetaminofén 500mg', 
+                'Ibuprofeno 400mg', 
+                'Amoxicilina 500mg',
+                'Aspirina 325mg',
+                'Vitamina C 1000mg',
+                'Complejo B'
+            ];
+            producto.cubiertoPorSeguro = productosCubiertos.includes(producto.name);
+        }
+    });
+}
+
+// Mostrar productos en el carrito
+function mostrarCarrito() {
+    const carritoVacio = document.getElementById('carritoVacio');
+    const carritoProductos = document.getElementById('carritoProductos');
+    const carritoAcciones = document.getElementById('carritoAcciones');
+
+    carritoProductos.innerHTML = '';
+
+    if (cart.length === 0) {
+        carritoVacio.classList.remove('disabled');
+        carritoAcciones.classList.add('disabled');
+        return;
+    }
+
+    carritoVacio.classList.add('disabled');
+    carritoAcciones.classList.remove('disabled');
+
+    cart.forEach((producto, index) => {
+        const div = document.createElement('div');
+        div.className = 'carrito-producto';
+        div.innerHTML = `
+            <div class="carrito-producto-info">
+                <div class="carrito-producto-icon">${producto.icon}</div>
+                <div class="carrito-producto-detalles">
+                    <div class="carrito-producto-nombre">${producto.name}</div>
+                    <div class="carrito-producto-descripcion">${producto.description}</div>
+                    <div class="carrito-producto-seguro ${producto.cubiertoPorSeguro ? 'cubierto' : 'no-cubierto'}">
+                        ${producto.cubiertoPorSeguro ? '✓ Cubierto por seguro' : '✗ No cubierto por seguro'}
+                    </div>
+                </div>
+            </div>
+            <div class="carrito-producto-cantidad">
+                <small>Cantidad</small>
+                <div class="cantidad-controls">
+                    <button class="cantidad-btn disminuir" data-index="${index}">-</button>
+                    <span class="cantidad-numero">${producto.cantidad}</span>
+                    <button class="cantidad-btn aumentar" data-index="${index}">+</button>
+                </div>
+            </div>
+            <div class="carrito-producto-precio">
+                <small>Precio unitario</small>
+                <p>$${producto.price.toFixed(2)}</p>
+            </div>
+            <div class="carrito-producto-subtotal">
+                <small>Subtotal</small>
+                <p>$${(producto.price * producto.cantidad).toFixed(2)}</p>
+            </div>
+            <button class="carrito-producto-eliminar" data-id="${producto.id}">
+                🗑️
+            </button>
+        `;
+        carritoProductos.appendChild(div);
+    });
+
+    actualizarEventosCarrito();
+}
+
+// Actualizar eventos del carrito
+function actualizarEventosCarrito() {
+    // Eliminar producto
+    document.querySelectorAll('.carrito-producto-eliminar').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const id = parseInt(e.currentTarget.dataset.id);
+            const producto = cart.find(p => p.id === id);
+            
+            Swal.fire({
+                title: '¿Eliminar producto?',
+                text: `¿Estás seguro de que quieres eliminar ${producto.name} del carrito?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#00A8E8',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cart = cart.filter(p => p.id !== id);
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    mostrarCarrito();
+                    actualizarTotalCarrito();
+                    mostrarAlerta(`✓ ${producto.name} eliminado del carrito`);
+                }
+            });
+        });
+    });
+
+    // Controles de cantidad
+    document.querySelectorAll('.cantidad-btn.aumentar').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const index = parseInt(e.currentTarget.dataset.index);
+            cart[index].cantidad++;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            mostrarCarrito();
+            actualizarTotalCarrito();
+        });
+    });
+
+    document.querySelectorAll('.cantidad-btn.disminuir').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const index = parseInt(e.currentTarget.dataset.index);
+            if (cart[index].cantidad > 1) {
+                cart[index].cantidad--;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                mostrarCarrito();
+                actualizarTotalCarrito();
+            }
+        });
+    });
+}
+
+// Actualizar total del carrito
+function actualizarTotalCarrito() {
+    const total = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+    document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+}
+
+// Vaciar carrito
+function vaciarCarrito() {
+    if (cart.length === 0) return;
+
+    Swal.fire({
+        title: '¿Vaciar carrito?',
+        text: 'Se eliminarán todos los productos del carrito',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#00A8E8',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, vaciar carrito',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            mostrarCarrito();
+            actualizarTotalCarrito();
+            mostrarAlerta('✓ Carrito vaciado');
+        }
+    });
+}
+
+// Procesar compra - mostrar formulario de cliente
+function procesarCompra() {
+    if (cart.length === 0) return;
+    
+    document.getElementById('formularioCliente').style.display = 'block';
+    document.querySelector('.cart-section').style.display = 'none';
+}
+
+// Toggle campos de seguro
+function toggleSeguro() {
+    const usaSeguro = document.getElementById('usaSeguro').checked;
+    const camposSeguro = document.getElementById('camposSeguro');
+    
+    if (usaSeguro) {
+        camposSeguro.style.display = 'block';
+    } else {
+        camposSeguro.style.display = 'none';
+        document.getElementById('aseguradora').value = '';
+        document.getElementById('numeroCarnet').value = '';
+    }
+}
+
+// Procesar formulario del cliente
+function procesarFormularioCliente(event) {
+    event.preventDefault();
+    
+    const usaSeguro = document.getElementById('usaSeguro').checked;
+    
+    // Validar campos de seguro si está activado
+    if (usaSeguro) {
+        const aseguradora = document.getElementById('aseguradora').value;
+        const numeroCarnet = document.getElementById('numeroCarnet').value;
+        
+        if (!aseguradora || !numeroCarnet) {
+            mostrarAlerta('Por favor complete todos los campos del seguro', 'error');
+            return;
+        }
+    }
+    
+    // Guardar datos del cliente
+    clienteData = {
+        nombre: document.getElementById('nombreCliente').value,
+        telefono: document.getElementById('telefonoCliente').value,
+        direccion: document.getElementById('direccionCliente').value,
+        usaSeguro: usaSeguro,
+        aseguradora: usaSeguro ? document.getElementById('aseguradora').value : '',
+        numeroCarnet: usaSeguro ? document.getElementById('numeroCarnet').value : ''
+    };
+    
+    // Mostrar pantalla de cobro
+    mostrarPantallaCobro();
+}
+
+// Mostrar pantalla de cobro
+function mostrarPantallaCobro() {
+    document.getElementById('formularioCliente').style.display = 'none';
+    document.getElementById('pantallaCobro').style.display = 'block';
+    
+    // Calcular totales
+    const totalBruto = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+    let cobertura = 0;
+    
+    if (clienteData.usaSeguro) {
+        // Calcular cobertura solo para productos cubiertos
+        cobertura = cart.reduce((acc, item) => {
+            if (item.cubiertoPorSeguro) {
+                return acc + (item.price * item.cantidad * coberturaSeguro);
+            }
+            return acc;
+        }, 0);
+    }
+    
+    const totalNeto = totalBruto - cobertura;
+    
+    // Actualizar resumen de productos
+    const resumenProductos = document.getElementById('resumenProductosCobro');
+    resumenProductos.innerHTML = '';
+    
+    cart.forEach(producto => {
+        const div = document.createElement('div');
+        div.className = 'producto-cobro';
+        div.innerHTML = `
+            <span>${producto.name} x${producto.cantidad}</span>
+            <span>$${(producto.price * producto.cantidad).toFixed(2)}</span>
+        `;
+        resumenProductos.appendChild(div);
+    });
+    
+    // Actualizar totales
+    document.getElementById('totalBrutoCobro').textContent = `$${totalBruto.toFixed(2)}`;
+    document.getElementById('coberturaCobro').textContent = `-$${cobertura.toFixed(2)}`;
+    document.getElementById('totalNetoCobro').textContent = `$${totalNeto.toFixed(2)}`;
+    
+    // Limpiar campo de pago
+    document.getElementById('montoPagado').value = '';
+    document.getElementById('cambioCalculado').textContent = '$0.00';
+    document.getElementById('errorPago').style.display = 'none';
+}
+
+// Calcular cambio
+function calcularCambio() {
+    const montoPagado = parseFloat(document.getElementById('montoPagado').value) || 0;
+    const totalNeto = parseFloat(document.getElementById('totalNetoCobro').textContent.replace('$', ''));
+    const cambio = montoPagado - totalNeto;
+    
+    const cambioElement = document.getElementById('cambioCalculado');
+    const errorPago = document.getElementById('errorPago');
+    
+    if (cambio >= 0) {
+        cambioElement.textContent = `$${cambio.toFixed(2)}`;
+        cambioElement.className = 'cambio-monto';
+        errorPago.style.display = 'none';
+    } else {
+        cambioElement.textContent = `-$${Math.abs(cambio).toFixed(2)}`;
+        cambioElement.className = 'cambio-monto insuficiente';
+        errorPago.textContent = `El pago es insuficiente. Faltan $${Math.abs(cambio).toFixed(2)}`;
+        errorPago.style.display = 'block';
+    }
+}
+
+// Confirmar pago y generar factura
+function confirmarPago() {
+    const montoPagado = parseFloat(document.getElementById('montoPagado').value) || 0;
+    const totalNeto = parseFloat(document.getElementById('totalNetoCobro').textContent.replace('$', ''));
+    
+    if (montoPagado < totalNeto) {
+        mostrarAlerta('El pago es insuficiente', 'error');
+        return;
+    }
+    
+    if (montoPagado === 0) {
+        mostrarAlerta('Ingrese el monto pagado', 'error');
+        return;
+    }
+    
+    // Generar factura
+    generarFactura(montoPagado);
+    
+    // Mostrar sección de factura
+    document.getElementById('pantallaCobro').style.display = 'none';
+    document.getElementById('facturaSection').style.display = 'block';
+}
+
+// Generar factura
+function generarFactura(montoPagado) {
+    const totalBruto = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+    let cobertura = 0;
+    
+    if (clienteData.usaSeguro) {
+        cobertura = cart.reduce((acc, item) => {
+            if (item.cubiertoPorSeguro) {
+                return acc + (item.price * item.cantidad * coberturaSeguro);
+            }
+            return acc;
+        }, 0);
+    }
+    
+    const totalNeto = totalBruto - cobertura;
+    const cambio = montoPagado - totalNeto;
+    
+    const facturaContenido = document.getElementById('facturaContenido');
+    facturaContenido.innerHTML = `
+        <div class="factura-header">
+            <h2>Farmacia Digital</h2>
+            <p>Factura de Venta</p>
+            <p>Fecha: ${new Date().toLocaleDateString()} - Hora: ${new Date().toLocaleTimeString()}</p>
+        </div>
+        
+        <div class="factura-info">
+            <div class="factura-cliente">
+                <h3>Datos del Cliente</h3>
+                <p><strong>Nombre:</strong> ${clienteData.nombre}</p>
+                <p><strong>Teléfono:</strong> ${clienteData.telefono}</p>
+                <p><strong>Dirección:</strong> ${clienteData.direccion}</p>
+                ${clienteData.usaSeguro ? `
+                    <p><strong>Aseguradora:</strong> ${clienteData.aseguradora}</p>
+                    <p><strong>No. Carnet:</strong> ${clienteData.numeroCarnet}</p>
+                ` : ''}
+            </div>
+            
+            <div class="factura-detalles">
+                <h3>Detalles de la Factura</h3>
+                <p><strong>No. Factura:</strong> ${Date.now()}</p>
+                <p><strong>Método de Pago:</strong> Efectivo</p>
+                <p><strong>Atendido por:</strong> ${document.getElementById('userName').textContent}</p>
+            </div>
+        </div>
+        
+        <div class="factura-productos">
+            <h3>Productos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${cart.map(producto => `
+                        <tr>
+                            <td>${producto.name}</td>
+                            <td>${producto.cantidad}</td>
+                            <td>$${producto.price.toFixed(2)}</td>
+                            <td>$${(producto.price * producto.cantidad).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="factura-totales">
+            <div class="total-factura">
+                <span>Subtotal:</span>
+                <span>$${totalBruto.toFixed(2)}</span>
+            </div>
+            ${clienteData.usaSeguro ? `
+                <div class="total-factura">
+                    <span>Cobertura Seguro (${coberturaSeguro * 100}%):</span>
+                    <span>-$${cobertura.toFixed(2)}</span>
+                </div>
+            ` : ''}
+            <div class="total-factura total-final-factura">
+                <span>TOTAL:</span>
+                <span>$${totalNeto.toFixed(2)}</span>
+            </div>
+            <div class="total-factura">
+                <span>Monto Pagado:</span>
+                <span>$${montoPagado.toFixed(2)}</span>
+            </div>
+            <div class="total-factura">
+                <span>Cambio:</span>
+                <span>$${cambio.toFixed(2)}</span>
+            </div>
+        </div>
+        
+        <div class="factura-mensaje">
+            <p><strong>¡Gracias por su compra!</strong></p>
+            <p>Para reclamos o devoluciones, presente esta factura dentro de los 7 días siguientes a la compra.</p>
+        </div>
+    `;
+}
+
+// Imprimir factura
+function imprimirFactura() {
+    window.print();
+}
+
+// Finalizar compra
+function finalizarCompra() {
+    // Limpiar carrito
+    cart = [];
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Mostrar mensaje de éxito
+    Swal.fire({
+        title: '¡Compra Finalizada!',
+        text: 'La venta se ha completado exitosamente',
+        icon: 'success',
+        confirmButtonColor: '#00A8E8',
+        confirmButtonText: 'Volver al Inicio'
+    }).then(() => {
+        volverAlUsuarioDashboard();
+    });
+}
+
+// Volver al dashboard
+function volverAlUsuarioDashboard() {
+    window.location.href = '../usuario-dashboard.html';
+}
+
+// Mostrar alerta
+function mostrarAlerta(mensaje, tipo = 'success') {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+    
+    Toast.fire({
+        icon: tipo,
+        title: mensaje
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+</html>

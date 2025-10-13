@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Farmacia Digital - Catálogo</title>
   <link rel="icon" type="image/png" href="assets/images/logo2.png">
-   <link rel="stylesheet" href="../assets/css/usuario-dashboard.css">
+   <link rel="stylesheet" href="../assent/css/usuario-dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   
@@ -32,13 +32,13 @@
       </li>
        <li class="menu-item">
         <a href="doctores.html">
-          <i>👨‍⚕</i>
+          <i>👨‍⚕️</i>
           <span>Buscar Doctores</span>
         </a>
       </li>
        <li class="menu-item">
         <a href="categorias.html">
-          <i>⚙</i>
+          <i>⚙️</i>
           <span>Categorías</span>
         </a>
       </li>
@@ -56,7 +56,7 @@
       </li>
       <li class="menu-item">
         <a href="#">
-          <i>⚙</i>
+          <i>⚙️</i>
           <span>Configuración</span>
         </a>
       </li>
@@ -73,7 +73,7 @@
       <div class="header-left">
         <button class="menu-btn" id="menu-btn">☰</button>
         <div class="logo">
-          <i>⚕</i>
+          <i>⚕️</i>
           Farmacia Digital
         </div>
       </div>
@@ -82,7 +82,7 @@
           <span>👤</span>
           <span id="userName">Usuario</span>
         </div>
-        <button class="cart-btn" onclick="toggleCart()">
+        <button class="cart-btn" onclick="irAlCarritoCompleto()">
           🛒
           <span class="cart-count" id="cartCount">0</span>
         </button>
@@ -129,7 +129,7 @@
         <p class="category-description">Problemas respiratorios</p>
       </div>
       <div class="category-card" onclick="filterByCategory('digestivos')">
-        <span class="category-icon">🍽</span>
+        <span class="category-icon">🍽️</span>
         <h3 class="category-title">Digestivos</h3>
         <p class="category-description">Salud digestiva</p>
       </div>
@@ -197,7 +197,7 @@
         <div class="insurance-card-container">
           <div class="insurance-card">
             <div class="insurance-front">
-              <div class="insurance-logo">🛡</div>
+              <div class="insurance-logo">🛡️</div>
               <div class="insurance-name">Seguros Reservas</div>
               <div class="insurance-type">Protección Médica Premium</div>
             </div>
@@ -325,14 +325,24 @@
     let loggedUser = localStorage.getItem('loggedUser');
 
     // Verificar si el usuario está logueado
-    if (!loggedUser) {
-        // En lugar de redirigir, establecer un usuario demo
-        loggedUser = 'Usuario Demo';
-        localStorage.setItem('loggedUser', loggedUser);
-    }
+   if (!loggedUser) {
+    // En lugar de redirigir, establecer un usuario demo
+    loggedUser = 'Usuario Demo';
+    localStorage.setItem('loggedUser', loggedUser);
+}
 
-    // Mostrar nombre del usuario
+// Mostrar solo el nombre del usuario (extraer del JSON si es necesario)
+if (typeof loggedUser === 'string' && loggedUser.includes('name')) {
+    try {
+        const userData = JSON.parse(loggedUser);
+        document.getElementById('userName').textContent = userData.name || 'Usuario';
+    } catch (e) {
+        document.getElementById('userName').textContent = loggedUser;
+    }
+} else {
     document.getElementById('userName').textContent = loggedUser;
+}
+
 
     // Datos de productos
     const products = [
@@ -367,10 +377,10 @@
         { id: 20, name: 'Pastillas para Garganta', price: 80, category: 'respiratorios', description: 'Alivio del dolor de garganta', icon: '🫁' },
         
         // Digestivos
-        { id: 21, name: 'Antiácido', price: 90, category: 'digestivos', description: 'Alivio rápido de acidez', icon: '🍽' },
-        { id: 22, name: 'Probióticos', price: 200, category: 'digestivos', description: 'Equilibrio de flora intestinal', icon: '🍽' },
-        { id: 23, name: 'Loperamida', price: 120, category: 'digestivos', description: 'Control de diarrea', icon: '🍽' },
-        { id: 24, name: 'Enzimas Digestivas', price: 180, category: 'digestivos', description: 'Ayuda digestiva natural', icon: '🍽' }
+        { id: 21, name: 'Antiácido', price: 90, category: 'digestivos', description: 'Alivio rápido de acidez', icon: '🍽️' },
+        { id: 22, name: 'Probióticos', price: 200, category: 'digestivos', description: 'Equilibrio de flora intestinal', icon: '🍽️' },
+        { id: 23, name: 'Loperamida', price: 120, category: 'digestivos', description: 'Control de diarrea', icon: '🍽️' },
+        { id: 24, name: 'Enzimas Digestivas', price: 180, category: 'digestivos', description: 'Ayuda digestiva natural', icon: '🍽️' }
     ];
 
     const categoryNames = {
@@ -382,6 +392,42 @@
         'digestivos': 'Digestivos'
     };
 
+    
+    
+
+    // Función para ir al carrito completo
+function irAlCarritoCompleto() {
+    // Guardar el carrito actual en localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Redirigir a la página del carrito completo
+    window.location.href = 'carrito.html';
+}
+    
+    
+    
+
+function irAlCarritoCompleto() {
+    // Asegurarse de que todos los productos tengan cantidad
+    cart.forEach(item => {
+        if (!item.cantidad) {
+            item.cantidad = 1;
+        }
+    });
+    
+    // Guardar el carrito actual en localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Redirigir a la página del carrito completo
+    window.location.href = 'carrito.html';
+}
+
+    
+    
+    
+    
+    
+    
     // Cargar contador del carrito al inicio
     updateCartCount();
 
@@ -423,7 +469,7 @@
         // Mostrar header de categoría
         document.getElementById('categoryHeader').style.display = 'flex';
         document.getElementById('categoryTitle').textContent = categoryNames[category];
-        document.getElementById('categorySubtitle').textContent = filtered.length + ' productos disponibles';
+        document.getElementById('categorySubtitle').textContent = `${filtered.length} productos disponibles`;
         
         // Mostrar productos filtrados
         displayProducts(filtered);
@@ -448,29 +494,34 @@
         document.getElementById('insuranceSection').style.display = 'none';
         document.getElementById('categoryHeader').style.display = 'flex';
         document.getElementById('categoryTitle').textContent = 'Resultados de búsqueda';
-        document.getElementById('categorySubtitle').textContent = filtered.length + ' productos encontrados para "' + searchTerm + '"';
+        document.getElementById('categorySubtitle').textContent = `${filtered.length} productos encontrados para "${searchTerm}"`;
         
         // Mostrar productos filtrados
         displayProducts(filtered);
     }
 
-    function addToCart(productId) {
-        const product = products.find(p => p.id === productId);
-        
-        if (cart.some(item => item.id === productId)) {
-            // Si ya existe, aumentar cantidad
-            cart = cart.map(item => 
-                item.id === productId ? {...item, cantidad: item.cantidad + 1} : item
-            );
-        } else {
-            // Si no existe, agregar nuevo
-            cart.push({...product, cantidad: 1});
-        }
-        
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartCount();
-        showAlert(`✓ ${product.name} agregado al carrito`);
+  function addToCart(productId) {
+    const product = products.find(p => p.id === productId);
+    
+    if (cart.some(item => item.id === productId)) {
+        // Si ya existe, aumentar cantidad
+        cart = cart.map(item => 
+            item.id === productId ? {...item, cantidad: item.cantidad + 1} : item
+        );
+    } else {
+        // Si no existe, agregar nuevo con estructura completa
+        const nuevoProducto = {
+            ...product,
+            cantidad: 1,
+            cubiertoPorSeguro: false // Se calculará en el carrito
+        };
+        cart.push(nuevoProducto);
     }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    showAlert(`✓ ${product.name} agregado al carrito`);
+}
 
     function displayProducts(productsToShow) {
         const container = document.getElementById('productsContainer');
@@ -556,7 +607,7 @@
                     <button class="quantity-btn" onclick="cambiarCantidad(${index}, -1)">-</button>
                     <span class="quantity">${item.cantidad}</span>
                     <button class="quantity-btn" onclick="cambiarCantidad(${index}, 1)">+</button>
-                    <button class="remove-btn" onclick="eliminarDelCarrito(${index})">🗑</button>
+                    <button class="remove-btn" onclick="eliminarDelCarrito(${index})">🗑️</button>
                 </div>
             </div>
         `).join('');
@@ -611,7 +662,7 @@
 
     function actualizarTotal() {
         const total = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
-        document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
+        document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
     }
 
     function showAlert(message) {
