@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmacia Digital - Categorías</title>
+  <link rel="icon" type="image/png" href="assets/images/logo2.png">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    /* Reset y estilos base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Estilos del botón hamburguesa */
+    .menu-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px 12px;
+      margin-right: 15px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    /* Estilos del menú lateral */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 1001;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .side-menu.active {
+      left: 0;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .menu-title {
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .menu-items {
+      list-style: none;
+    }
+
+    .menu-item {
+      margin-bottom: 10px;
+    }
+
+    .menu-item a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-item a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-item i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Contenedor principal */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* Header de página */
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #00A8E8;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Sección de búsqueda */
+    .search-section {
+      margin-bottom: 2rem;
+    }
+
+    .search-container {
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 1.1rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #00A8E8;
+      box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.1);
+    }
+
+    /* Grid de categorías */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .category-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .category-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .category-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .category-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+      border-color: #00A8E8;
+    }
+
+    .category-card.active {
+      border-color: #00A8E8;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
+      transform: translateY(-5px);
+    }
+
+    .category-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .category-card:hover .category-icon {
+      transform: scale(1.1);
+    }
+
+    .category-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.8rem;
+      color: #333;
+    }
+
+    .category-card.active .category-title {
+      color: white;
+    }
+
+    .category-description {
+      color: #666;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .category-card.active .category-description {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .category-count {
+      display: inline-block;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+
+    .category-card.active .category-count {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .category-card {
+        padding: 1.5rem;
+      }
+
+      .category-icon {
+        font-size: 3rem;
+      }
+
+      .category-title {
+        font-size: 1.3rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .categories-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-container {
+        margin: 0 1rem;
+      }
+    }
+
+    /* Animaciones */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .category-card {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .category-card:nth-child(1) { animation-delay: 0.1s; }
+    .category-card:nth-child(2) { animation-delay: 0.2s; }
+    .category-card:nth-child(3) { animation-delay: 0.3s; }
+    .category-card:nth-child(4) { animation-delay: 0.4s; }
+    .category-card:nth-child(5) { animation-delay: 0.5s; }
+    .category-card:nth-child(6) { animation-delay: 0.6s; }
+  </style>
+</head>
+<body>
+  <!-- Menú lateral -->
+  <div class="side-menu" id="side-menu">
+    <div class="menu-header">
+      <span class="menu-title">Menú</span>
+      <button class="close-btn" id="close-btn">×</button>
+    </div>
+    <ul class="menu-items">
+      <li class="menu-item">
+        <a href="usuario-dashboard.html">
+          <i>🏠</i>
+          <span>Inicio</span>
+        </a>
+      </li>
+       <li class="menu-item">
+        <a href="#">
+          <i>👤</i>
+          <span>Mi Perfil</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="categorias.html">
+          <i>📂</i>
+          <span>Categorías</span>
+        </a>
+      </li>
+     
+      <li class="menu-item">
+        <a href="pedidos.html">
+          <i>📋</i>
+          <span>Mis Pedidos</span>
+        </a>
+      </li>
+
+      <li class="menu-item">
+        <a href="contactos.html">
+          <i>📞</i>
+          <span>Contacto</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="#">
+          <i>⚙</i>
+          <span>Configuración</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Overlay del menú -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="menu-btn" id="menu-btn">☰</button>
+        <div class="logo">💊 Farmacia Digital</div>
+      </div>
+      <div class="header-right">
+        <button class="logout-btn" onclick="logout()">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor principal -->
+  <div class="container">
+    <!-- Header de página -->
+    <div class="page-header">
+      <h1 class="page-title">Categorías de Productos</h1>
+      <p class="page-subtitle">Explora nuestro catálogo organizado por categorías para encontrar fácilmente los medicamentos y productos que necesitas</p>
+    </div>
+
+    <!-- Sección de búsqueda -->
+    <div class="search-section">
+      <div class="search-container">
+        <i class="search-icon">🔍</i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar en categorías..." onkeyup="filterCategories()">
+      </div>
+    </div>
+
+    <!-- Grid de categorías -->
+    <div class="categories-grid" id="categoriesGrid">
+      <div class="category-card" onclick="goToCategory('analgesicos')">
+        <span class="category-icon">💊</span>
+        <h3 class="category-title">Analgésicos</h3>
+        <p class="category-description">Medicamentos para aliviar diferentes tipos de dolor y molestias</p>
+        <span class="category-count">15 productos</span>
+      </div>
+      
+      <div class="category-card" onclick="goToCategory('antibioticos')">
+        <span class="category-icon">🦠</span>
+        <h3 class="category-title">Antibióticos</h3>
+        <p class="category-description">Tratamiento efectivo contra infecciones bacterianas</p>
+        <span class="category-count">12 productos</span>
+      </div>
+      
+      <div class="category-card" onclick="goToCategory('vitaminas')">
+        <span class="category-icon">🌟</span>
+        <h3 class="category-title">Vitaminas</h3>
+        <p class="category-description">Suplementos nutricionales para mantener tu salud óptima</p>
+        <span class="category-count">20 productos</span>
+      </div>
+      
+      <div class="category-card" onclick="goToCategory('dermatologicos')">
+        <span class="category-icon">🧴</span>
+        <h3 class="category-title">Dermatológicos</h3>
+        <p class="category-description">Productos especializados para el cuidado y tratamiento de la piel</p>
+        <span class="category-count">18 productos</span>
+      </div>
+      
+      <div class="category-card" onclick="goToCategory('respiratorios')">
+        <span class="category-icon">🫁</span>
+        <h3 class="category-title">Respiratorios</h3>
+        <p class="category-description">Medicamentos para problemas respiratorios y del sistema pulmonar</p>
+        <span class="category-count">10 productos</span>
+      </div>
+      
+      <div class="category-card" onclick="goToCategory('digestivos')">
+        <span class="category-icon">🍽</span>
+        <h3 class="category-title">Digestivos</h3>
+        <p class="category-description">Tratamientos para mejorar la salud del sistema digestivo</p>
+        <span class="category-count">14 productos</span>
+      </div>
+      
+      <div class="category-card" onclick="goToCategory('cardiovasculares')">
+        <span class="category-icon">❤</span>
+        <h3 class="category-title">Cardiovasculares</h3>
+        <p class="category-description">Medicamentos para la salud del corazón y sistema circulatorio</p>
+        <span class="category-count">8 productos</span>
+      </div>
+      
+      <div class="category-card" onclick="goToCategory('neurologia')">
+        <span class="category-icon">🧠</span>
+        <h3 class="category-title">Neurología</h3>
+        <p class="category-description">Tratamientos para el sistema nervioso y salud mental</p>
+        <span class="category-count">6 productos</span>
+      </div>
+      
+      <div class="category-card" onclick="goToCategory('oftalmologicos')">
+        <span class="category-icon">👁</span>
+        <h3 class="category-title">Oftalmológicos</h3>
+        <p class="category-description">Productos especializados para el cuidado de los ojos</p>
+        <span class="category-count">7 productos</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variables para el menú
+    const menuBtn = document.getElementById('menu-btn');
+    const sideMenu = document.getElementById('side-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const closeBtn = document.getElementById('close-btn');
+
+    // Abrir menú
+    menuBtn.addEventListener('click', () => {
+      sideMenu.classList.add('active');
+      menuOverlay.classList.add('active');
+    });
+
+    // Cerrar menú
+    function closeMenu() {
+      sideMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+    }
+
+    closeBtn.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    // Función para filtrar categorías
+    function filterCategories() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const categoryCards = document.querySelectorAll('.category-card');
+      
+      categoryCards.forEach(card => {
+        const title = card.querySelector('.category-title').textContent.toLowerCase();
+        const description = card.querySelector('.category-description').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+          card.style.display = 'block';
+          card.style.animation = 'fadeIn 0.3s ease forwards';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Función para ir a una categoría específica
+    function goToCategory(category) {
+      // Mostrar mensaje de confirmación
+      Swal.fire({
+        title: '¡Categoría seleccionada!',
+        text: `Redirigiendo a la categoría: ${category}`,
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true
+      }).then(() => {
+        // Aquí puedes redirigir a la página principal con la categoría filtrada
+        window.location.href = `farmacia-digital-FONDO-Y-CATEGORIAS-ORIGINALES.html?category=${category}`;
+      });
+    }
+
+    // Función para cerrar sesión
+    function logout() {
+      Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: '¿Estás seguro de que deseas cerrar sesión?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#00A8E8',
+        cancelButtonColor: '#dc3545',
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: 'Sesión cerrada',
+            text: 'Has cerrado sesión exitosamente',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1500
+          }).then(() => {
+            // Redirigir a la página de login
+            window.location.href = 'login.html';
+          });
+        }
+      });
+    }
+
+    // Efecto de entrada para las tarjetas
+    document.addEventListener('DOMContentLoaded', function() {
+      const categoryCards = document.querySelectorAll('.category-card');
+      
+      categoryCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+          card.style.transition = 'all 0.6s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+    });
+
+    // Tecla Escape para cerrar menú
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeMenu();
+      }
+    });
+  </script>
+</body>
+</html>
