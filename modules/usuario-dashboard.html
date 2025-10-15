@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmacia Digital - Catálogo</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo2.png">
+  <link rel="stylesheet" href="../assets/css/usuario-dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <!-- Menú lateral -->
+  <div class="side-menu" id="side-menu">
+    <div class="menu-header">
+      <span class="menu-title">Menú</span>
+      <button class="close-btn" id="close-btn">×</button>
+    </div>
+    <ul class="menu-items">
+      <li class="menu-item"><a href="usuario-dashboard.html" onclick="showCategories()"><i>🏠</i><span>Inicio</span></a></li>
+      <li class="menu-item"><a href="perfil.html"><i>👤</i><span>Mi Perfil</span></a></li>
+      <li class="menu-item"><a href="doctores.html"><i>👨‍⚕️</i><span>Buscar Doctores</span></a></li>
+      <li class="menu-item"><a href="pedidos.html"><i>📋</i><span>Mis Pedidos</span></a></li>
+      <li class="menu-item"><a href="contactos.html"><i>📞</i><span>Contactos</span></a></li>
+    </ul>
+  </div>
+
+  <div class="menu-overlay" id="menu-overlay"></div>
+
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="menu-btn" id="menu-btn">☰</button>
+        <div class="logo">⚕️ Farmacia Digital</div>
+      </div>
+      <div class="header-right">
+        <div class="user-info"><span>👤</span><span id="userName">Usuario</span></div>
+        <button class="cart-btn" onclick="irAlCarritoCompleto()">🛒<span class="cart-count" id="cartCount">0</span></button>
+        <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="search-section">
+      <div class="search-container">
+        <i class="search-icon">🔍</i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar medicamentos..." onkeyup="filterProducts()">
+      </div>
+    </div>
+
+    
+
+    <div class="category-header" id="categoryHeader" style="display:none;">
+      <div class="category-title-section">
+        <h2 id="categoryTitle">Categoría</h2>
+        <p class="category-subtitle" id="categorySubtitle">Productos disponibles</p>
+      </div>
+      <button class="back-to-categories-btn" onclick="showCategories()">← Volver a categorías</button>
+    </div>
+
+    <div id="productsContainer" style="display: none;"></div>
+  </div>
+
+  <div class="cart-modal" id="cartModal"><div class="cart-content"></div></div>
+  <div class="alert" id="alert">Producto agregado al carrito</div>
+
+  <script src="../assets/js/script.js"></script>
+
+  <script>
+    // Inline script: cart, products loading and UI behaviors (cleaned, original logic preserved)
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let loggedUser = localStorage.getItem('loggedUser');
+
+    if (!loggedUser) {
+      const demo = { nombre: 'Usuario Demo', correo: '' };
+      localStorage.setItem('loggedUser', JSON.stringify(demo));
+      loggedUser = localStorage.getItem('loggedUser');
+    }
+
+    let displayName = 'Usuario';
+    try {
+      let parsed = null;
+      if (typeof loggedUser === 'string') {
+        try { parsed = JSON.parse(loggedUser); } catch (e) { parsed = loggedUser; }
+      } else { parsed = loggedUser; }
+      if (typeof parsed === 'object' && parsed !== null) {
+        displayName = parsed.nombre || parsed.name || parsed.correo || parsed.email || 'Usuario';
+        if ((parsed.nombre || parsed.name) && (parsed.correo || parsed.email)) {
+          const correo = parsed.correo || parsed.email || '';
+          displayName = (parsed.nombre || parsed.name) + (correo ? ` (${correo})` : '');
+        }
+      } else if (typeof parsed === 'string') displayName = parsed;
+    } catch (e) { displayName = 'Usuario'; }
+
+    try {
+      const s = document.createElement('script');
+      s.src = '../assets/js/user.js';
+      s.onload = function() { if (window.getNameOnly) document.getElementById('userName').textContent = getNameOnly(); };
+      document.head.appendChild(s);
+    } catch (e) { document.getElementById('userName').textContent = displayName; }
+
+    let products = [];
+    const localFallbackProducts = [];
+
+    (async function fetchProducts() {
+      const candidateUrls = ['../php/products.php','./php/products.php','php/products.php','/php/products.php', window.location.origin + '/php/products.php'];
+      let loaded = false;
+      for (let i = 0; i < candidateUrls.length && !loaded; i++) {
+        const tryUrl = candidateUrls[i];
+        try {
+          const resp = await fetch(tryUrl, { cache: 'no-store' });
+          const text = await resp.text();
+          if (!resp.ok) continue;
+          if (!text || text.trim() === '') continue;
+          try {
+            const json = JSON.parse(text);
+            if (json && json.status === 'ok' && Array.isArray(json.products)) {
+              products = json.products.map(p => ({ id: Number(p.id), name: p.name, price: Number(p.price), category: p.category, description: p.description || '', icon: p.icon || '💊' }));
+              loaded = true; break;
+            } else continue;
+          } catch (parseErr) { continue; }
+        } catch (e) { continue; }
+      }
+      if (!loaded) products = localFallbackProducts;
+      try { if (Array.isArray(products) && products.length > 0) displayProducts(products); else showCategories(); } catch (e) { showCategories(); }
+    })();
+
+    const categoryNames = { 'analgesicos':'Analgésicos','antibioticos':'Antibióticos','vitaminas':'Vitaminas','dermatologicos':'Dermatológicos','respiratorios':'Respiratorios','digestivos':'Digestivos' };
+    function getCategoryLabel(cat){ if(!cat) return ''; return categoryNames[cat] || cat.charAt(0).toUpperCase()+cat.slice(1); }
+
+    function irAlCarritoCompleto(){ cart.forEach(item=>{ if(!item.cantidad) item.cantidad=1; }); localStorage.setItem('cart', JSON.stringify(cart)); window.location.href='carrito.html'; }
+
+    document.addEventListener('DOMContentLoaded', function(){ updateCartCount(); document.getElementById('menu-btn').addEventListener('click', ()=>{ document.getElementById('side-menu').classList.add('active'); document.getElementById('menu-overlay').classList.add('active'); });
+      document.getElementById('close-btn').addEventListener('click', ()=>{ document.getElementById('side-menu').classList.remove('active'); document.getElementById('menu-overlay').classList.remove('active'); });
+      document.getElementById('menu-overlay').addEventListener('click', ()=>{ document.getElementById('side-menu').classList.remove('active'); document.getElementById('menu-overlay').classList.remove('active'); });
+    });
+
+    function showCategories(){ document.getElementById('categoriesGrid').style.display='grid'; document.getElementById('insuranceSection').style.display='block'; document.getElementById('categoryHeader').style.display='none'; document.getElementById('productsContainer').style.display='none'; document.querySelectorAll('.category-card').forEach(card=>card.classList.remove('active')); }
+
+    function filterByCategory(category){ const filtered = products.filter(p=>p.category===category); document.getElementById('categoriesGrid').style.display='none'; document.getElementById('insuranceSection').style.display='none'; document.getElementById('categoryHeader').style.display='flex'; document.getElementById('categoryTitle').textContent = categoryNames[category]; document.getElementById('categorySubtitle').textContent = `${filtered.length} productos disponibles`; displayProducts(filtered); }
+
+    function filterProducts(){ const searchTerm = document.getElementById('searchInput').value.toLowerCase(); if (searchTerm==='') { showCategories(); return; } const filtered = products.filter(product => product.name.toLowerCase().includes(searchTerm) || product.description.toLowerCase().includes(searchTerm) || (categoryNames[product.category]||'').toLowerCase().includes(searchTerm)); document.getElementById('categoriesGrid').style.display='none'; document.getElementById('insuranceSection').style.display='none'; document.getElementById('categoryHeader').style.display='flex'; document.getElementById('categoryTitle').textContent='Resultados de búsqueda'; document.getElementById('categorySubtitle').textContent = `${filtered.length} productos encontrados para "${searchTerm}"`; displayProducts(filtered); }
+
+    function addToCart(productId){ const product = products.find(p=>p.id===productId); if (!product) return; if (cart.some(item=>item.id===productId)) { cart = cart.map(item => item.id===productId ? {...item, cantidad: item.cantidad+1} : item); } else { const nuevoProducto = {...product, cantidad:1, cubiertoPorSeguro:false}; cart.push(nuevoProducto); } localStorage.setItem('cart', JSON.stringify(cart)); updateCartCount(); showAlert(`✓ ${product.name} agregado al carrito`); }
+
+    function displayProducts(productsToShow){ const container = document.getElementById('productsContainer'); container.style.display='block'; if (productsToShow.length===0) { container.innerHTML = `<div style="text-align:center;padding:3rem;color:#666;"><i style="font-size:3rem;display:block">🔍</i><h3>No se encontraron productos</h3><p>Intenta con otros términos de búsqueda</p></div>`; return; } container.innerHTML = `<div class="products-grid">${productsToShow.map(product=>`<div class="product-card"><div class="product-image"><span>${product.icon}</span><div class="product-badge">${getCategoryLabel(product.category)}</div></div><div class="product-info"><div class="product-category">${getCategoryLabel(product.category)}</div><h3 class="product-name">${product.name}</h3><p class="product-description">${product.description}</p><div class="product-footer"><span class="product-price">$${product.price}</span><button class="add-to-cart-btn" onclick="addToCart(${product.id})">Agregar</button></div></div></div>`).join('')}</div>`; }
+
+    function updateCartCount(){ const count = cart.reduce((total,item)=> total + (item.cantidad||0),0); const el = document.getElementById('cartCount'); if (el) el.textContent = count; }
+
+    function toggleCart(){ const modal = document.getElementById('cartModal'); modal.classList.toggle('show'); if (modal.classList.contains('show')) mostrarCarrito(); }
+
+    function mostrarCarrito(){ const carritoVacio = document.getElementById('carritoVacio'); const carritoProductos = document.getElementById('carritoProductos'); const carritoComprado = document.getElementById('carritoComprado'); if (!carritoVacio) return; carritoVacio.classList.remove('disabled'); carritoProductos.classList.add('disabled'); carritoComprado.classList.add('disabled'); if (cart.length===0) return; carritoVacio.classList.add('disabled'); carritoProductos.classList.remove('disabled'); const cartItems = document.getElementById('cartItems'); if (cartItems) cartItems.innerHTML = cart.map((item,index)=>`<div class="cart-item"><div class="item-image">${item.icon}</div><div class="item-details"><div class="item-name">${item.name}</div><div class="item-price">$${item.price}</div></div><div class="item-controls"><button class="quantity-btn" onclick="cambiarCantidad(${index}, -1)">-</button><span class="quantity">${item.cantidad}</span><button class="quantity-btn" onclick="cambiarCantidad(${index}, 1)">+</button><button class="remove-btn" onclick="eliminarDelCarrito(${index})">🗑️</button></div></div>`).join(''); actualizarTotal(); }
+
+    function cambiarCantidad(index,cambio){ if (cart[index].cantidad + cambio <= 0) { eliminarDelCarrito(index); return; } cart[index].cantidad += cambio; localStorage.setItem('cart', JSON.stringify(cart)); mostrarCarrito(); updateCartCount(); }
+
+    function eliminarDelCarrito(index){ const producto = cart[index]; Swal.fire({ title: '¿Eliminar producto?', text: `¿Estás seguro de que quieres eliminar "${producto.name}" del carrito?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d', confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar', backdrop: true, allowOutsideClick: true }).then((result)=>{ if (result.isConfirmed) { cart.splice(index,1); localStorage.setItem('cart', JSON.stringify(cart)); mostrarCarrito(); updateCartCount(); Swal.fire({ title: '¡Eliminado!', text: 'El producto ha sido eliminado del carrito', icon: 'success', timer:1500, showConfirmButton:false }); } }); }
+
+    function actualizarTotal(){ const total = cart.reduce((acc,item)=> acc + ((item.price||0) * (item.cantidad||0)),0); const el = document.getElementById('totalAmount'); if (el) el.textContent = `$${total.toFixed(2)}`; }
+
+    function showAlert(message){ const alert = document.getElementById('alert'); if (!alert) return; alert.textContent = message; alert.classList.add('show'); setTimeout(()=>{ alert.classList.remove('show'); },3000); }
+
+    function logout(){ localStorage.removeItem('loggedUser'); localStorage.removeItem('cart'); setTimeout(()=>{ window.location.href = '../index.html'; },800); }
+
+    function clearCart(){ if (cart.length===0) return; Swal.fire({ title: '¿Vaciar carrito?', text: '¿Estás seguro de que quieres eliminar todos los productos del carrito?', icon: 'warning', showCancelButton:true, confirmButtonColor:'#dc3545', cancelButtonColor:'#6c757d', confirmButtonText:'Sí, vaciar', cancelButtonText:'Cancelar' }).then((result)=>{ if (result.isConfirmed){ cart=[]; localStorage.setItem('cart', JSON.stringify(cart)); mostrarCarrito(); updateCartCount(); Swal.fire({ title:'¡Carrito vaciado!', text:'Todos los productos han sido eliminados', icon:'success', timer:1500, showConfirmButton:false }); } }); }
+
+    function purchaseCart(){ if (cart.length===0) return; const total = cart.reduce((acc,item)=> acc + ((item.price||0)*(item.cantidad||0)),0); Swal.fire({ title:'¿Confirmar pedido?', html:`<p><strong>Total: $${total.toFixed(2)}</strong></p><p>¿Deseas proceder con el pedido?</p>`, icon:'question', showCancelButton:true, confirmButtonColor:'#00A8E8', cancelButtonColor:'#6c757d', confirmButtonText:'Confirmar pedido', cancelButtonText:'Cancelar' }).then((result)=>{ if (result.isConfirmed){ cart = []; localStorage.setItem('cart', JSON.stringify(cart)); updateCartCount(); document.getElementById('carritoVacio').classList.add('disabled'); document.getElementById('carritoProductos').classList.add('disabled'); document.getElementById('carritoComprado').classList.remove('disabled'); Swal.fire({ title:'¡Pedido realizado!', text:'Tu pedido está siendo procesado. Recibirás una confirmación pronto.', icon:'success', timer:2000, showConfirmButton:false }); } }); }
+
+    function continueShopping(){ toggleCart(); showCategories(); }
+  </script>
+
+</body>
+</html>
+
+    <!-- Grid de categorías -->
+    <div class="categories-grid" id="categoriesGrid">
+      <div class="category-card" onclick="filterByCategory('analgesicos')">
+        <span class="category-icon">💊</span>
+        <h3 class="category-title">Analgésicos</h3>
+        <p class="category-description">Medicamentos para el dolor</p>
+      </div>
+      <div class="category-card" onclick="filterByCategory('antibioticos')">
+        <span class="category-icon">🦠</span>
+        <h3 class="category-title">Antibióticos</h3>
+        <p class="category-description">Tratamiento de infecciones</p>
+      </div>
+      <div class="category-card" onclick="filterByCategory('vitaminas')">
+        <span class="category-icon">🌟</span>
+        <h3 class="category-title">Vitaminas</h3>
+        <p class="category-description">Suplementos nutricionales</p>
+      </div>
+      <div class="category-card" onclick="filterByCategory('dermatologicos')">
+        <span class="category-icon">🧴</span>
+        <h3 class="category-title">Dermatológicos</h3>
+        <p class="category-description">Cuidado de la piel</p>
+      </div>
+      <div class="category-card" onclick="filterByCategory('respiratorios')">
+        <span class="category-icon">🫁</span>
+        <h3 class="category-title">Respiratorios</h3>
+        <p class="category-description">Problemas respiratorios</p>
+      </div>
+      <div class="category-card" onclick="filterByCategory('digestivos')">
+        <span class="category-icon">🍽️</span>
+        <h3 class="category-title">Digestivos</h3>
+        <p class="category-description">Salud digestiva</p>
+      </div>
+    </div>
+
+    <!-- Sección de Seguros Médicos -->
+    <div class="insurance-section" id="insuranceSection">
+      <div class="insurance-header">
+        <h2 class="insurance-title">Seguros Médicos Aceptados</h2>
+        <p class="insurance-subtitle">Conoce los seguros que aceptamos y sus beneficios</p>
+      </div>
+      
+      <div class="insurance-grid">
+        <!-- Tarjeta para ARS Humano -->
+        <div class="insurance-card-container">
+          <div class="insurance-card">
+            <div class="insurance-front">
+              <div class="insurance-logo">🏥</div>
+              <div class="insurance-name">ARS Humano</div>
+              <div class="insurance-type">Administradora de Riesgos de Salud</div>
+            </div>
+            <div class="insurance-back">
+              <div class="insurance-info-title">ARS Humano</div>
+              <ul class="insurance-features">
+                <li>Cobertura nacional amplia</li>
+                <li>Red de farmacias extensa</li>
+                <li>Descuentos hasta 80%</li>
+                <li>Atención 24/7</li>
+                <li>Sin límite de edad</li>
+              </ul>
+              <div class="insurance-contact">
+                <div class="insurance-phone">📞 809-200-1234</div>
+                <div class="insurance-hours">Lun-Dom: 24 horas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta para ARS Universal -->
+        <div class="insurance-card-container">
+          <div class="insurance-card">
+            <div class="insurance-front">
+              <div class="insurance-logo">🌐</div>
+              <div class="insurance-name">ARS Universal</div>
+              <div class="insurance-type">Servicios de Salud Integrales</div>
+            </div>
+            <div class="insurance-back">
+              <div class="insurance-info-title">ARS Universal</div>
+              <ul class="insurance-features">
+                <li>Plan familiar completo</li>
+                <li>Medicamentos genéricos</li>
+                <li>Descuentos preferenciales</li>
+                <li>Cobertura especializada</li>
+                <li>Pagos flexibles</li>
+              </ul>
+              <div class="insurance-contact">
+                <div class="insurance-phone">📞 809-200-5678</div>
+                <div class="insurance-hours">Lun-Vie: 8:00-18:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta para Seguros Reservas -->
+        <div class="insurance-card-container">
+          <div class="insurance-card">
+            <div class="insurance-front">
+              <div class="insurance-logo">🛡️</div>
+              <div class="insurance-name">Seguros Reservas</div>
+              <div class="insurance-type">Protección Médica Premium</div>
+            </div>
+            <div class="insurance-back">
+              <div class="insurance-info-title">Seguros Reservas</div>
+              <ul class="insurance-features">
+                <li>Cobertura premium</li>
+                <li>Medicamentos importados</li>
+                <li>Sin copagos</li>
+                <li>Urgencias cubiertas</li>
+                <li>Reembolsos rápidos</li>
+              </ul>
+              <div class="insurance-contact">
+                <div class="insurance-phone">📞 809-200-9999</div>
+                <div class="insurance-hours">Lun-Sab: 7:00-19:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta para Mapfre Salud ARS -->
+        <div class="insurance-card-container">
+          <div class="insurance-card">
+            <div class="insurance-front">
+              <div class="insurance-logo">🏢</div>
+              <div class="insurance-name">Mapfre Salud ARS</div>
+              <div class="insurance-type">Líder en Seguros Médicos</div>
+            </div>
+            <div class="insurance-back">
+              <div class="insurance-info-title">Mapfre Salud ARS</div>
+              <ul class="insurance-features">
+                <li>Red internacional</li>
+                <li>Tecnología avanzada</li>
+                <li>Descuentos corporativos</li>
+                <li>Medicina preventiva</li>
+                <li>App móvil exclusiva</li>
+              </ul>
+              <div class="insurance-contact">
+                <div class="insurance-phone">📞 809-200-7777</div>
+                <div class="insurance-hours">Lun-Dom: 24 horas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header de categoría (hidden by default) -->
+    <div class="category-header" id="categoryHeader">
+      <div class="category-title-section">
+        <h2 id="categoryTitle">Categoría</h2>
+        <p class="category-subtitle" id="categorySubtitle">Productos disponibles</p>
+      </div>
+      <button class="back-to-categories-btn" onclick="showCategories()">
+        ← Volver a categorías
+      </button>
+    </div>
+
+    <!-- Contenedor de productos -->
+    <div id="productsContainer" style="display: none;">
+      <!-- Los productos se cargan dinámicamente aquí -->
+    </div>
+
+  </div>
+
+          <!-- Modal del carrito -->
+          <div class="cart-modal" id="cartModal">
+            <div class="cart-content">
+              <div class="cart-header">
+                <h2 class="cart-title">
+                  🛒 Carrito de Compras
+                </h2>
+                <button class="close-cart" onclick="toggleCart()">×</button>
+              </div>
+
+              <!-- Carrito vacío -->
+              <div id="carritoVacio" class="empty-cart">
+                <i>🛒</i>
+                <h3>Tu carrito está vacío</h3>
+                <p>Agrega productos para continuar</p>
+              </div>
+
+              <!-- Carrito con productos -->
+              <div id="carritoProductos" class="disabled">
+                <div id="cartItems">
+                  <!-- Los items se cargan dinámicamente -->
+                </div>
+        
+                <div class="cart-footer">
+                  <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="totalAmount">$0.00</span>
+                  </div>
+                  <div class="cart-actions">
+                    <button class="cart-btn-secondary" onclick="clearCart()">
+                      Vaciar carrito
+                    </button>
+                    <button class="cart-btn-primary" onclick="purchaseCart()">
+                      Realizar pedido
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Compra exitosa -->
+              <div id="carritoComprado" class="purchase-success disabled">
+                <i>✅</i>
+                <h3>¡Pedido realizado con éxito!</h3>
+                <p>Tu pedido está siendo procesado</p>
+                <button class="cart-btn-primary" onclick="continueShopping()" style="margin-top: 1rem; width: 100%;">
+                  Seguir comprando
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alerta flotante -->
+          <div class="alert" id="alert">
+            Producto agregado al carrito
+          </div>
+
+          <!-- Elfsight AI Chatbot | Asistente Farmacia Digital -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-1b12611d-b7f6-4184-b3d6-911c87582fb9" data-elfsight-app-lazy></div>
+
+          <script>
+            // Variables globales (only set if not defined elsewhere to avoid redeclare)
+              if (typeof cart === 'undefined') cart = JSON.parse(localStorage.getItem('cart')) || [];
+              if (typeof loggedUser === 'undefined') loggedUser = localStorage.getItem('loggedUser');
+
+            // Verificar si el usuario está logueado
+            if (!loggedUser) {
+              // En lugar de redirigir, establecer un usuario demo simple
+              const demo = { nombre: 'Usuario Demo', correo: '' };
+              localStorage.setItem('loggedUser', JSON.stringify(demo));
+              loggedUser = localStorage.getItem('loggedUser');
+            }
+
+            // Mostrar solo el nombre del usuario: soportar varios formatos posibles
+            //if (typeof displayName === 'undefined') var displayName = 'Usuario';
+          try {
+            // Si loggedUser es un string JSON, parsearlo; si es un string plano, usarlo directo
+            let parsed = null;
+            if (typeof loggedUser === 'string') {
+              // Intentar parsear JSON
+              try {
+                parsed = JSON.parse(loggedUser);
+              } catch (e) {
+                // no es JSON
+                parsed = loggedUser;
+              }
+            } else {
+              parsed = loggedUser;
+            }
+
+            if (typeof parsed === 'object' && parsed !== null) {
+              // Posibles claves usadas en distintas partes del proyecto: nombre, name, correo, email
+              displayName = parsed.nombre || parsed.name || parsed.correo || parsed.email || 'Usuario';
+              // Si la clave correo/email está presente pero queremos solo nombre, preferir nombre
+              if ((parsed.nombre || parsed.name) && (parsed.correo || parsed.email)) {
+                // mostrar "Nombre (correo)"
+                const correo = parsed.correo || parsed.email || '';
+                displayName = (parsed.nombre || parsed.name) + (correo ? ` (${correo})` : '');
+              }
+            } else if (typeof parsed === 'string') {
+              displayName = parsed;
+            }
+          } catch (e) {
+            displayName = 'Usuario';
+          }
+
+          // Mostrar solo el nombre (primer token)
+          try {
+            const s = document.createElement('script');
+            s.src = '../assets/js/user.js';
+            s.onload = function() {
+              document.getElementById('userName').textContent = getNameOnly();
+            };
+            document.head.appendChild(s);
+          } catch (e) {
+            document.getElementById('userName').textContent = 'Usuario';
+          }
+
+
+
+          // === CARGA DE PRODUCTOS DESDE EL SERVIDOR ===
+(async function fetchProducts() {
+  // URLs candidatas (por si cambia la ruta relativa)
+  const candidateUrls = [
+    './php/products.php',
+    '../php/products.php',
+    'php/products.php',
+    '/php/products.php',
+    window.location.origin + '/php/products.php'
+  ];
+
+  let products = []; // siempre inicializado
+  let loaded = false;
+
+  for (let i = 0; i < candidateUrls.length && !loaded; i++) {
+    const tryUrl = candidateUrls[i];
+    try {
+      console.debug('🔍 Intentando cargar productos desde:', tryUrl);
+      const resp = await fetch(tryUrl, { cache: 'no-store' });
+
+      if (!resp.ok) {
+        console.warn('⚠️ Respuesta no OK:', resp.status, 'en', tryUrl);
+        continue;
+      }
+
+      const text = await resp.text();
+      if (!text || text.trim() === '') {
+        console.warn('⚠️ Respuesta vacía desde', tryUrl);
+        continue;
+      }
+
+      // Intentar parsear JSON
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch (err) {
+        console.warn('⚠️ No se pudo parsear JSON desde', tryUrl, err);
+        continue;
+      }
+
+      // Validar estructura JSON esperada
+      if (json && json.status === 'ok' && Array.isArray(json.products)) {
+        products = json.products.map(p => ({
+          id: Number(p.id),
+          name: p.name || 'Producto sin nombre',
+          price: Number(p.price) || 0,
+          category: p.category || 'general',
+          description: p.description || '',
+          icon: p.icon || '💊'
+        }));
+        console.log('✅ Productos cargados correctamente desde', tryUrl);
+        loaded = true;
+        break;
+      } else {
+        console.warn('⚠️ Estructura JSON inesperada desde', tryUrl, json);
+      }
+
+    } catch (err) {
+      console.warn('❌ Error al obtener productos desde', tryUrl, err);
+    }
+  }
+
+
+  // === Mostrar productos una vez cargados ===
+  try {
+    if (Array.isArray(products) && products.length > 0) {
+      displayProducts(products);
+    } else {
+      showCategories();
+    }
+  } catch (err) {
+    console.warn('⚠️ Error al mostrar productos:', err);
+    showCategories();
+  }
+})();
+
+
+      // categoryNames ya está declarado anteriormente, no es necesario volver a declararlo aquí.
+
+          function getCategoryLabel(cat) {
+            if (!cat) return '';
+            return categoryNames[cat] || cat.charAt(0).toUpperCase() + cat.slice(1);
+          }
+
+    
+    
+
+            // Función para ir al carrito completo
+        function irAlCarritoCompleto() {
+            // Guardar el carrito actual en localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+    
+            // Redirigir a la página del carrito completo
+            window.location.href = 'carrito.html';
+        }
+    
+    
+    
+        function irAlCarritoCompleto() {
+            // Asegurarse de que todos los productos tengan cantidad
+            cart.forEach(item => {
+                if (!item.cantidad) {
+                    item.cantidad = 1;
+                }
+            });
+    
+            // Guardar el carrito actual en localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+    
+            // Redirigir a la página del carrito completo
+            window.location.href = 'carrito.html';
+        }
+
+    
+    
+    
+    
+    
+            // Cargar contador del carrito al inicio
+            updateCartCount();
+
+            // Event listeners
+            document.getElementById('menu-btn').addEventListener('click', function() {
+                document.getElementById('side-menu').classList.add('active');
+                document.getElementById('menu-overlay').classList.add('active');
+            });
+
+            document.getElementById('close-btn').addEventListener('click', function() {
+                document.getElementById('side-menu').classList.remove('active');
+                document.getElementById('menu-overlay').classList.remove('active');
+            });
+
+            document.getElementById('menu-overlay').addEventListener('click', function() {
+                document.getElementById('side-menu').classList.remove('active');
+                document.getElementById('menu-overlay').classList.remove('active');
+            });
+
+            function showCategories() {
+                document.getElementById('categoriesGrid').style.display = 'grid';
+                document.getElementById('insuranceSection').style.display = 'block';
+                document.getElementById('categoryHeader').style.display = 'none';
+                document.getElementById('productsContainer').style.display = 'none';
+        
+                // Remover active de todas las categorías
+                document.querySelectorAll('.category-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+            }
+
+            function filterByCategory(category) {
+                const filtered = products.filter(p => p.category === category);
+        
+                // Ocultar grid de categorías y seguros
+                document.getElementById('categoriesGrid').style.display = 'none';
+                document.getElementById('insuranceSection').style.display = 'none';
+        
+                // Mostrar header de categoría
+                document.getElementById('categoryHeader').style.display = 'flex';
+                document.getElementById('categoryTitle').textContent = categoryNames[category];
+                document.getElementById('categorySubtitle').textContent = `${filtered.length} productos disponibles`;
+        
+                // Mostrar productos filtrados
+                displayProducts(filtered);
+            }
+
+            function filterProducts() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        
+                if (searchTerm === '') {
+                    showCategories();
+                    return;
+                }
+        
+                const filtered = products.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.description.toLowerCase().includes(searchTerm) ||
+                    categoryNames[product.category].toLowerCase().includes(searchTerm)
+                );
+        
+                // Ocultar categorías y seguros, mostrar header
+                document.getElementById('categoriesGrid').style.display = 'none';
+                document.getElementById('insuranceSection').style.display = 'none';
+                document.getElementById('categoryHeader').style.display = 'flex';
+                document.getElementById('categoryTitle').textContent = 'Resultados de búsqueda';
+                document.getElementById('categorySubtitle').textContent = `${filtered.length} productos encontrados para "${searchTerm}"`;
+        
+                // Mostrar productos filtrados
+                displayProducts(filtered);
+            }
+
+          function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+    
+            if (cart.some(item => item.id === productId)) {
+                // Si ya existe, aumentar cantidad
+                cart = cart.map(item => 
+                    item.id === productId ? {...item, cantidad: item.cantidad + 1} : item
+                );
+            } else {
+                // Si no existe, agregar nuevo con estructura completa
+                const nuevoProducto = {
+                    ...product,
+                    cantidad: 1,
+                    cubiertoPorSeguro: false // Se calculará en el carrito
+                };
+                cart.push(nuevoProducto);
+            }
+    
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showAlert(`✓ ${product.name} agregado al carrito`);
+        }
+
+            function displayProducts(productsToShow) {
+                const container = document.getElementById('productsContainer');
+                container.style.display = 'block';
+        
+                if (productsToShow.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <i style="font-size: 3rem; margin-bottom: 1rem; display: block;">🔍</i>
+                            <h3>No se encontraron productos</h3>
+                            <p>Intenta con otros términos de búsqueda</p>
+                        </div>
+                    `;
+                    return;
+                }
+        
+                container.innerHTML = `
+                    <div class="products-grid">
+                        ${productsToShow.map(product => `
+                            <div class="product-card">
+                    <div class="product-image">
+                      <span>${product.icon}</span>
+                      <div class="product-badge">${getCategoryLabel(product.category)}</div>
+                    </div>
+                                <div class="product-info">
+                                    <div class="product-category">${getCategoryLabel(product.category)}</div>
+                                    <h3 class="product-name">${product.name}</h3>
+                                    <p class="product-description">${product.description}</p>
+                                    <div class="product-footer">
+                                        <span class="product-price">$${product.price}</span>
+                                        <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
+                                            Agregar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            function updateCartCount() {
+                const count = cart.reduce((total, item) => total + item.cantidad, 0);
+                document.getElementById('cartCount').textContent = count;
+            }
+
+            function toggleCart() {
+                const modal = document.getElementById('cartModal');
+                modal.classList.toggle('show');
+        
+                if (modal.classList.contains('show')) {
+                    mostrarCarrito();
+                }
+            }
+
+            function mostrarCarrito() {
+                const carritoVacio = document.getElementById('carritoVacio');
+                const carritoProductos = document.getElementById('carritoProductos');
+                const carritoComprado = document.getElementById('carritoComprado');
+        
+                // Reset estados
+                carritoVacio.classList.remove('disabled');
+                carritoProductos.classList.add('disabled');
+                carritoComprado.classList.add('disabled');
+        
+                if (cart.length === 0) {
+                    return;
+                }
+        
+                // Mostrar productos
+                carritoVacio.classList.add('disabled');
+                carritoProductos.classList.remove('disabled');
+        
+                const cartItems = document.getElementById('cartItems');
+                cartItems.innerHTML = cart.map((item, index) => `
+                    <div class="cart-item">
+                        <div class="item-image">${item.icon}</div>
+                        <div class="item-details">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-price">$${item.price}</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn" onclick="cambiarCantidad(${index}, -1)">-</button>
+                            <span class="quantity">${item.cantidad}</span>
+                            <button class="quantity-btn" onclick="cambiarCantidad(${index}, 1)">+</button>
+                            <button class="remove-btn" onclick="eliminarDelCarrito(${index})">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+        
+                actualizarTotal();
+            }
+
+            function cambiarCantidad(index, cambio) {
+                if (cart[index].cantidad + cambio <= 0) {
+                    eliminarDelCarrito(index);
+                    return;
+                }
+        
+                cart[index].cantidad += cambio;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                mostrarCarrito();
+                updateCartCount();
+            }
+
+            // FUNCIÓN CORREGIDA - CON CONFIRMACIÓN SWEETALERT2
+            function eliminarDelCarrito(index) {
+                const producto = cart[index];
+        
+                Swal.fire({
+                    title: '¿Eliminar producto?',
+                    text: `¿Estás seguro de que quieres eliminar "${producto.name}" del carrito?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    backdrop: true,
+                    allowOutsideClick: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        cart.splice(index, 1);
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        mostrarCarrito();
+                        updateCartCount();
+                
+                        Swal.fire({
+                            title: '¡Eliminado!',
+                            text: 'El producto ha sido eliminado del carrito',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            }
+
+            function actualizarTotal() {
+                const total = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+                document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+            }
+
+            function showAlert(message) {
+                const alert = document.getElementById('alert');
+                alert.textContent = message;
+                alert.classList.add('show');
+        
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                }, 3000);
+            }
+
+            function logout() {
+                localStorage.removeItem('loggedUser');
+                localStorage.removeItem('cart');
+                setTimeout(() => {
+            window.location.href = '../index.html';
+          }, 800);
+            }
+
+            function clearCart() {
+                if (cart.length === 0) return;
+        
+                Swal.fire({
+                    title: '¿Vaciar carrito?',
+                    text: '¿Estás seguro de que quieres eliminar todos los productos del carrito?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, vaciar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        cart = [];
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        mostrarCarrito();
+                        updateCartCount();
+                
+                        Swal.fire({
+                            title: '¡Carrito vaciado!',
+                            text: 'Todos los productos han sido eliminados',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            }
+
+            function purchaseCart() {
+                if (cart.length === 0) return;
+        
+                const total = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+        
+                Swal.fire({
+                    title: '¿Confirmar pedido?',
+                    html: `
+                        <p><strong>Total: $${total.toFixed(2)}</strong></p>
+                        <p>¿Deseas proceder con el pedido?</p>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00A8E8',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Confirmar pedido',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Simular procesamiento del pedido
+                        cart = [];
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        updateCartCount();
+                
+                        // Mostrar vista de compra exitosa
+                        document.getElementById('carritoVacio').classList.add('disabled');
+                        document.getElementById('carritoProductos').classList.add('disabled');
+                        document.getElementById('carritoComprado').classList.remove('disabled');
+                
+                        Swal.fire({
+                            title: '¡Pedido realizado!',
+                            text: 'Tu pedido está siendo procesado. Recibirás una confirmación pronto.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            }
+
+            function continueShopping() {
+                toggleCart();
+                showCategories();
+            }
+          </script>
+        </body>
+        </html>

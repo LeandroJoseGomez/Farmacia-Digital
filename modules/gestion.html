@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Medicamentos - Farmacia Digital</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo2.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #E8F8F5 0%, #D5F4E6 50%, #B2EBF2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,168,232,0.2);
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      text-decoration: none;
+    }
+
+    .navbar-logo {
+      height: 45px;
+      width: auto;
+      background: white;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .btn-back {
+      padding: 10px 24px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      color: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-back:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header h1 {
+      font-size: 38px;
+      margin-bottom: 10px;
+      color: #003D5C;
+      font-weight: 800;
+    }
+
+    .page-header p {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 24px;
+      padding: 45px;
+      box-shadow: 0 10px 40px rgba(0,168,232,0.15);
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-section {
+      margin-bottom: 35px;
+    }
+
+    .form-section h2 {
+      color: #003D5C;
+      font-size: 22px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #E8F8F5;
+      font-weight: 800;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    label .required {
+      color: #dc3545;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background: #f8f9fa;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #00A8E8;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(0,168,232,0.1);
+      background: #fff;
+    }
+
+    input.error-input, select.error-input, textarea.error-input {
+      border-color: #dc3545;
+      background: #fff5f5;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: auto;
+      cursor: pointer;
+    }
+
+    .checkbox-item label {
+      margin: 0;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(0,168,232,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,168,232,0.4);
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 15px;
+      background: #6c757d;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: 500;
+      display: none;
+      animation: slideIn 0.3s;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-error {
+      background: #fee;
+      color: #c33;
+      border-left: 4px solid #c33;
+    }
+
+    .alert-success {
+      background: #e8f8f5;
+      color: #00A86B;
+      border-left: 4px solid #00A86B;
+    }
+
+    .alert-warning {
+      background: #fff3cd;
+      color: #856404;
+      border-left: 4px solid #ffc107;
+    }
+
+    .records-section {
+      margin-top: 40px;
+      background: white;
+      border-radius: 24px;
+      padding: 35px;
+      box-shadow: 0 10px 40px rgba(0,168,232,0.15);
+    }
+
+    .records-section h2 {
+      color: #003D5C;
+      margin-bottom: 25px;
+      font-weight: 800;
+      font-size: 24px;
+    }
+
+    .record-item {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+      border-left: 5px solid #00A8E8;
+      transition: all 0.3s;
+    }
+
+    .record-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 5px 20px rgba(0,168,232,0.15);
+    }
+
+    .record-item h3 {
+      color: #003D5C;
+      font-size: 20px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .record-item p {
+      color: #666;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .no-records {
+      text-align: center;
+      color: #999;
+      padding: 40px;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .form-card, .records-section {
+        padding: 30px 20px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <img src="../assets/images/logo2.png" alt="Farmacia Digital" class="navbar-logo">
+    </a>
+    <a href="dashboard.html" class="btn-back">← Volver al Dashboard</a>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>💊 Gestión de Prescripciónes</h1>
+      <p>Registra y administra tus medicamentos y tratamientos</p>
+    </div>
+
+    <div class="form-card">
+      <form id="dataForm" onsubmit="submitForm(event)">
+        
+        <div class="form-section">
+          <h2>Información del Medicamento</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="projectName">Nombre del Medicamento <span class="required">*</span></label>
+              <input type="text" id="projectName" placeholder="Ej: Ibuprofeno 400mg" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="projectType">Tipo de Medicamento <span class="required">*</span></label>
+              <select id="projectType" required>
+                <option value="">Selecciona una opción</option>
+                <option value="analgesico">Analgésico</option>
+                <option value="antibiotico">Antibiótico</option>
+                <option value="antiinflamatorio">Antiinflamatorio</option>
+                <option value="antihipertensivo">Antihipertensivo</option>
+                <option value="vitamina">Vitamina/Suplemento</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startDate">Fecha de Inicio <span class="required">*</span></label>
+              <input type="date" id="startDate" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="endDate">Fecha de Finalización</label>
+              <input type="date" id="endDate">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Indicaciones y Notas <span class="required">*</span></label>
+            <textarea id="description" placeholder="Dosis, frecuencia, indicaciones especiales..." required></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Prescripción y Médico</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="teamLeader">Médico Tratante <span class="required">*</span></label>
+              <input type="text" id="teamLeader" placeholder="Dr. Juan Pérez" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="teamSize">Dosis Diaria <span class="required">*</span></label>
+              <input type="number" id="teamSize" min="1" placeholder="Número de tomas" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">Costo Mensual Estimado (COP)</label>
+            <input type="number" id="budget" min="0" step="1000" placeholder="0">
+          </div>
+
+          <div class="form-group">
+            <label>Horarios de Toma</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="tech1" value="Mañana">
+                <label for="tech1">Mañana</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="tech2" value="Mediodía">
+                <label for="tech2">Mediodía</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="tech3" value="Tarde">
+                <label for="tech3">Tarde</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="tech4" value="Noche">
+                <label for="tech4">Noche</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="tech5" value="Antes de comer">
+                <label for="tech5">Antes de comer</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="tech6" value="Después de comer">
+                <label for="tech6">Después de comer</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Estado y Prioridad</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="status">Estado del Tratamiento <span class="required">*</span></label>
+              <select id="status" required>
+                <option value="">Selecciona un estado</option>
+                <option value="planning">Por Iniciar</option>
+                <option value="development">En Tratamiento</option>
+                <option value="testing">En Evaluación</option>
+                <option value="completed">Completado</option>
+                <option value="paused">Pausado</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="priority">Prioridad <span class="required">*</span></label>
+              <select id="priority" required>
+                <option value="">Selecciona prioridad</option>
+                <option value="low">Baja</option>
+                <option value="medium">Media</option>
+                <option value="high">Alta</option>
+                <option value="critical">Crítica</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Guardar Medicamento</button>
+        <button type="button" class="btn-secondary" onclick="resetForm()">Limpiar Formulario</button>
+
+        <div id="formAlert" class="alert"></div>
+      </form>
+    </div>
+
+    <div class="records-section">
+      <h2>Medicamentos Registrados</h2>
+      <div id="recordsList"></div>
+    </div>
+  </div>
+
+  <!-- Elfsight AI Chatbot | Asistente Farmacia Digital -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-1b12611d-b7f6-4184-b3d6-911c87582fb9" data-elfsight-app-lazy></div>
+
+  <script>
+    // Verificar autenticación usando helper compartido
+    (function() {
+      const s = document.createElement('script');
+      s.src = '../assets/js/user.js';
+      s.onload = function() {
+        const u = getRawUser();
+        if (!u) {
+          window.location.href = "index.html";
+        }
+      };
+      document.head.appendChild(s);
+    })();
+
+    // Cargar proyectos al iniciar
+    loadProjects();
+
+    function showAlert(message, type) {
+      const alert = document.getElementById("formAlert");
+      alert.textContent = message;
+      alert.className = `alert alert-${type} show`;
+      
+      setTimeout(() => {
+        alert.classList.remove('show');
+      }, 5000);
+    }
+
+    function validateDates() {
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+      
+      if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+        return false;
+      }
+      return true;
+    }
+
+    function getSelectedTechnologies() {
+      const technologies = [];
+      for (let i = 1; i <= 6; i++) {
+        const checkbox = document.getElementById(`tech${i}`);
+        if (checkbox.checked) {
+          technologies.push(checkbox.value);
+        }
+      }
+      return technologies;
+    }
+
+    function submitForm(event) {
+      event.preventDefault();
+      
+      // Validar fechas
+      if (!validateDates()) {
+        showAlert("❌ La fecha de finalización no puede ser anterior a la fecha de inicio", "error");
+        document.getElementById("endDate").classList.add('error-input');
+        return;
+      }
+      
+      // Recopilar datos del formulario
+      const projectData = {
+        id: Date.now(),
+        projectName: document.getElementById("projectName").value.trim(),
+        projectType: document.getElementById("projectType").value,
+        startDate: document.getElementById("startDate").value,
+        endDate: document.getElementById("endDate").value,
+        description: document.getElementById("description").value.trim(),
+        teamLeader: document.getElementById("teamLeader").value.trim(),
+        teamSize: document.getElementById("teamSize").value,
+        budget: document.getElementById("budget").value,
+        technologies: getSelectedTechnologies(),
+        status: document.getElementById("status").value,
+        priority: document.getElementById("priority").value,
+        createdAt: new Date().toISOString(),
+  createdBy: (getRawUser && getRawUser().email) || ''
+      };
+      
+      // Validar que se haya seleccionado al menos una tecnología
+      if (projectData.technologies.length === 0) {
+        showAlert("⚠️ Por favor, selecciona al menos un horario", "warning");
+        return;
+      }
+      
+      // Guardar en localStorage
+      const projects = JSON.parse(localStorage.getItem('projects') || '[]');
+      projects.push(projectData);
+      localStorage.setItem('projects', JSON.stringify(projects));
+      
+      showAlert("✓ Medicamento registrado exitosamente", "success");
+      
+      // Limpiar formulario y recargar lista
+      document.getElementById("dataForm").reset();
+      loadProjects();
+      
+      // Scroll hacia arriba
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+      if (confirm("¿Estás seguro de que deseas limpiar el formulario?")) {
+        document.getElementById("dataForm").reset();
+        document.querySelectorAll('.error-input').forEach(input => {
+          input.classList.remove('error-input');
+        });
+        showAlert("Formulario limpiado", "warning");
+      }
+    }
+
+    function loadProjects() {
+      const projects = JSON.parse(localStorage.getItem('projects') || '[]');
+      const recordsList = document.getElementById("recordsList");
+      
+      if (projects.length === 0) {
+        recordsList.innerHTML = '<div class="no-records">No hay medicamentos registrados aún</div>';
+        return;
+      }
+      
+      projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
+      recordsList.innerHTML = projects.map(project => {
+        const priorityEmoji = {
+          low: '🟢',
+          medium: '🟡',
+          high: '🟠',
+          critical: '🔴'
+        };
+        
+        const statusText = {
+          planning: 'Por Iniciar',
+          development: 'En Tratamiento',
+          testing: 'En Evaluación',
+          completed: 'Completado',
+          paused: 'Pausado'
+        };
+        
+        return `
+          <div class="record-item">
+            <h3>${project.projectName} ${priorityEmoji[project.priority] || ''}</h3>
+            <p><strong>Tipo:</strong> ${project.projectType}</p>
+            <p><strong>Estado:</strong> ${statusText[project.status]}</p>
+            <p><strong>Médico:</strong> ${project.teamLeader} | <strong>Dosis diaria:</strong> ${project.teamSize} tomas</p>
+            <p><strong>Horarios:</strong> ${project.technologies.join(', ')}</p>
+            <p><strong>Inicio:</strong> ${new Date(project.startDate).toLocaleDateString('es-ES')}</p>
+            ${project.description ? `<p><strong>Indicaciones:</strong> ${project.description}</p>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Validación en tiempo real de fechas
+    document.getElementById("endDate").addEventListener('change', function() {
+      if (!validateDates()) {
+        this.classList.add('error-input');
+        showAlert("⚠️ La fecha de finalización debe ser posterior a la fecha de inicio", "warning");
+      } else {
+        this.classList.remove('error-input');
+      }
+    });
+  </script>
+
+</body>
+</html>

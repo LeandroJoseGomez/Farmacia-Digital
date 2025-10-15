@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmacia Digital - Buscar Doctores</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo2.png">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Google Maps API placeholder (set YOUR_API_KEY si lo usas) -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Inline styles from actualización (trimmed) */
+  </style>
+</head>
+<body>
+  <!-- menú, header y contenido para doctores (copiado de Actualizacion) -->
+  <script src="../assets/js/script.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmacia Digital - Buscar Doctores</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo2.png">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    /* Reset y estilos base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Estilos del botón hamburguesa */
+    .menu-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px 12px;
+      margin-right: 15px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    /* Estilos del menú lateral */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 1001;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .side-menu.active {
+      left: 0;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .menu-title {
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .menu-items {
+      list-style: none;
+    }
+
+    .menu-item {
+      margin-bottom: 10px;
+    }
+
+    .menu-item a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-item a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-item i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Contenedor principal */
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* Header de página */
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Contenedor de búsqueda */
+    .search-container {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    /* Pestañas */
+    .tabs-container {
+      display: flex;
+      margin-bottom: 2rem;
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 0.5rem;
+      overflow: hidden;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .tab-button.active {
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 168, 232, 0.3);
+    }
+
+    .tab-button:not(.active):hover {
+      background: rgba(0, 168, 232, 0.1);
+      color: #00A8E8;
+    }
+
+    /* Contenido de pestañas */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Formulario */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+      color: #333;
+      font-size: 1rem;
+    }
+
+    .form-select, .form-input {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: white;
+      color: #333;
+    }
+
+    .form-select:focus, .form-input:focus {
+      outline: none;
+      border-color: #00A8E8;
+      box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .form-select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.8rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 3rem;
+      appearance: none;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Nota informativa */
+    .info-note {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      border-left: 4px solid #00A8E8;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .info-note::before {
+      content: '💡';
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .info-note-text {
+      margin-left: 2rem;
+    }
+
+    /* Botón de búsqueda */
+    .search-btn {
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
+      border: none;
+      padding: 1.2rem 4rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 168, 232, 0.3);
+      display: block;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .search-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 168, 232, 0.4);
+    }
+
+    .search-btn:active {
+      transform: translateY(0);
+    }
+
+    .search-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .search-btn:hover::before {
+      left: 100%;
+    }
+
+    /* Resultados */
+    .results-container {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-top: 2rem;
+    }
+
+    .results-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .results-title {
+      font-size: 2rem;
+      color: #00A8E8;
+      margin-bottom: 0.5rem;
+    }
+
+    .doctor-card {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #00A8E8;
+      transition: all 0.3s ease;
+    }
+
+    .doctor-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .doctor-name {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #00A8E8;
+      margin-bottom: 0.5rem;
+    }
+
+    .doctor-info {
+      color: #666;
+      margin-bottom: 0.3rem;
+    }
+
+    .doctor-actions {
+      margin-top: 1rem;
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 168, 232, 0.3);
+    }
+
+    .action-btn.secondary {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+
+    .no-results h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #00A8E8;
+    }
+
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs-container {
+        flex-direction: column;
+      }
+
+      .tab-button {
+        margin-bottom: 0.5rem;
+      }
+
+      .search-btn {
+        width: 100%;
+        padding: 1rem 2rem;
+      }
+
+      .container {
+        padding: 0 0.5rem;
+      }
+
+      .search-container {
+        padding: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-content {
+        padding: 0 0.5rem;
+      }
+
+      .logo {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- Elfsight AI Chatbot | Asistente Farmacia Digital -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-1b12611d-b7f6-4184-b3d6-911c87582fb9" data-elfsight-app-lazy></div>
+
+  <!-- Menú lateral -->
+  <div class="side-menu" id="side-menu">
+    <div class="menu-header">
+      <span class="menu-title">Menú</span>
+      <button class="close-btn" id="close-btn">×</button>
+    </div>
+    <ul class="menu-items">
+      <li class="menu-item">
+  <a href="usuario-dashboard.html">
+          <i>🏠</i>
+          <span>Inicio</span>
+        </a>
+      </li>
+       <li class="menu-item">
+        <a href="#">
+          <i>👤</i>
+          <span>Mi Perfil</span>
+        </a>
+      </li>
+       <li class="menu-item">
+        <a href="doctores.html">
+          <i>👨‍⚕</i>
+          <span>Buscar Doctores</span>
+        </a>
+      </li>
+     
+      <li class="menu-item">
+        <a href="pedidos.html">
+          <i>📋</i>
+          <span>Mis Pedidos</span>
+        </a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="contactos.html">
+          <i>📞</i>
+          <span>Contacto</span>
+        </a>
+      </li>
+
+    </ul>
+  </div>
+
+  <!-- Overlay del menú -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="menu-btn" id="menu-btn">☰</button>
+        <div class="logo">👨‍⚕ Buscar Doctores</div>
+      </div>
+      <div class="header-right">
+        <button class="logout-btn" onclick="logout()">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor principal -->
+  <div class="container">
+    <!-- Header de página -->
+    <div class="page-header">
+      <h1 class="page-title">Encuentra tu Doctor Ideal</h1>
+      <p class="page-subtitle">Conectamos a nuestros usuarios con los mejores profesionales de la salud según su seguro médico y ubicación</p>
+    </div>
+
+    <!-- Contenedor de búsqueda -->
+    <div class="search-container">
+      <!-- Pestañas -->
+      <div class="tabs-container">
+        <button class="tab-button active" onclick="switchTab('doctor')">
+          👨‍⚕ Buscar Doctor
+        </button>
+        <button class="tab-button" onclick="switchTab('pharmacist')">
+          💊 Consulta a Farmacéutico
+        </button>
+      </div>
+
+      <!-- Contenido pestaña: Buscar Doctor -->
+      <div id="doctor-tab" class="tab-content active">
+        <form onsubmit="searchDoctors(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">ARS:</label>
+              <select class="form-select" id="arsSelect" required>
+                <option value="">Seleccionar...</option>
+                <option value="humano">ARS Humano</option>
+                <option value="universal">Universal</option>
+                <option value="senasa">SENASA</option>
+                <option value="mapfre">Mapfre Salud ARS</option>
+                <option value="palic">ARS Palic</option>
+                <option value="simag">SIMAG</option>
+                <option value="futuro">ARS Futuro</option>
+                <option value="primera">Primera ARS</option>
+                <option value="monumental">Monumental</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ciudad:</label>
+              <select class="form-select" id="citySelect" required>
+                <option value="">Seleccionar...</option>
+                <option value="santo-domingo">Santo Domingo</option>
+                <option value="santiago">Santiago</option>
+                <option value="la-vega">La Vega</option>
+                <option value="puerto-plata">Puerto Plata</option>
+                <option value="san-cristobal">San Cristóbal</option>
+                <option value="san-pedro">San Pedro de Macorís</option>
+                <option value="barahona">Barahona</option>
+                <option value="azua">Azua</option>
+                <option value="moca">Moca</option>
+                <option value="bani">Baní</option>
+                <option value="higuey">Higüey</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Especialidad:</label>
+              <select class="form-select" id="specialtySelect" required>
+                <option value="">Seleccionar...</option>
+                <option value="medicina-general">Medicina General</option>
+                <option value="cardiologia">Cardiología</option>
+                <option value="dermatologia">Dermatología</option>
+                <option value="neurologia">Neurología</option>
+                <option value="pediatria">Pediatría</option>
+                <option value="ginecologia">Ginecología y Obstetricia</option>
+                <option value="oftalmologia">Oftalmología</option>
+                <option value="traumatologia">Traumatología</option>
+                <option value="psiquiatria">Psiquiatría</option>
+                <option value="endocrinologia">Endocrinología</option>
+                <option value="gastroenterologia">Gastroenterología</option>
+                <option value="urologia">Urología</option>
+                <option value="neumologia">Neumología</option>
+                <option value="oncologia">Oncología</option>
+                <option value="otorrinolaringologia">Otorrinolaringología</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Centro Médico:</label>
+              <select class="form-select" id="centerSelect">
+                <option value="">Seleccionar...</option>
+                <option value="cedimat">CEDIMAT</option>
+                <option value="hospital-general">Hospital General Plaza</option>
+                <option value="clinica-abreu">Clínica Dr. Abreu</option>
+                <option value="hospital-salvador">Hospital Salvador B. Gautier</option>
+                <option value="centro-medico">Centro Médico Dominicano</option>
+                <option value="clinica-corominas">Clínica Dr. Corominas</option>
+                <option value="hospital-metropolitano">Hospital Metropolitano</option>
+                <option value="clinica-union-medica">Clínica Unión Médica</option>
+                <option value="hospital-cabral">Hospital Dr. Cabral y Báez</option>
+                <option value="clinica-cruz-jiminián">Clínica Cruz Jiminián</option>
+                <option value="hospital-moscoso">Hospital Moscoso Puello</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Nombres/Apellidos:</label>
+              <input type="text" class="form-input" id="doctorName" placeholder="Ej: Dr. Juan Pérez, María González">
+            </div>
+          </div>
+
+          <div class="info-note">
+            <div class="info-note-text">
+              <strong>Nota importante:</strong> La información disponible en nuestra página no incluye el universo completo de doctores. Los resultados mostrados corresponden a profesionales afiliados a nuestro sistema de salud.
+            </div>
+          </div>
+
+          <button type="submit" class="search-btn">
+            🔍 Buscar
+          </button>
+        </form>
+      </div>
+
+      <!-- Contenido pestaña: Consulta a Farmacéutico -->
+      <div id="pharmacist-tab" class="tab-content">
+        <form onsubmit="consultPharmacist(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Tipo de Consulta:</label>
+              <select class="form-select" id="consultType" required>
+                <option value="">Seleccionar...</option>
+                <option value="medicamento">Información sobre medicamento</option>
+                <option value="interaccion">Interacciones medicamentosas</option>
+                <option value="dosis">Dosis y administración</option>
+                <option value="efectos">Efectos secundarios</option>
+                <option value="sustituto">Medicamento sustituto</option>
+                <option value="generic">Medicamentos genéricos</option>
+                <option value="precio">Consulta de precios</option>
+                <option value="general">Consulta general</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Medicamento de Interés:</label>
+              <input type="text" class="form-input" id="medicationName" placeholder="Nombre del medicamento">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Describe tu consulta:</label>
+              <textarea class="form-input" id="consultDescription" rows="4" placeholder="Describe detalladamente tu consulta o pregunta..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tu Nombre:</label>
+              <input type="text" class="form-input" id="patientName" placeholder="Nombre completo" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Teléfono de Contacto:</label>
+              <input type="tel" class="form-input" id="phoneNumber" placeholder="809-XXX-XXXX" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Email (Opcional):</label>
+              <input type="email" class="form-input" id="emailAddress" placeholder="tu@email.com">
+            </div>
+          </div>
+
+          <div class="info-note">
+            <div class="info-note-text">
+              <strong>Horario de atención:</strong> Nuestros farmacéuticos especialistas te contactarán en las próximas 2 horas durante horario laboral (Lun-Vie: 8:00 AM - 6:00 PM, Sáb: 8:00 AM - 2:00 PM).
+            </div>
+          </div>
+
+          <button type="submit" class="search-btn">
+            💬 Enviar Consulta
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Contenedor de resultados -->
+    <div class="results-container" id="resultsContainer">
+      <div class="results-header">
+        <h2 class="results-title">Resultados de Búsqueda</h2>
+      </div>
+      <div id="resultsContent">
+        <!-- Los resultados se cargan dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variables para el menú
+    const menuBtn = document.getElementById('menu-btn');
+    const sideMenu = document.getElementById('side-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const closeBtn = document.getElementById('close-btn');
+
+    // Abrir menú
+    menuBtn.addEventListener('click', () => {
+      sideMenu.classList.add('active');
+      menuOverlay.classList.add('active');
+    });
+
+    // Cerrar menú
+    function closeMenu() {
+      sideMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+    }
+
+    closeBtn.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    // Función para cambiar pestañas
+    function switchTab(tabType) {
+      const doctorTab = document.getElementById('doctor-tab');
+      const pharmacistTab = document.getElementById('pharmacist-tab');
+      const tabButtons = document.querySelectorAll('.tab-button');
+      
+      // Remover active de todos los botones
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      
+      if (tabType === 'doctor') {
+        doctorTab.classList.add('active');
+        pharmacistTab.classList.remove('active');
+        tabButtons[0].classList.add('active');
+      } else {
+        pharmacistTab.classList.add('active');
+        doctorTab.classList.remove('active');
+        tabButtons[1].classList.add('active');
+      }
+      
+      // Ocultar resultados al cambiar de pestaña
+      document.getElementById('resultsContainer').style.display = 'none';
+    }
+
+    // Función para buscar doctores (intenta el endpoint php/doctors.php, fallback a datos locales)
+    async function searchDoctors(event) {
+      event.preventDefault();
+      
+      const ars = document.getElementById('arsSelect').value;
+      const city = document.getElementById('citySelect').value;
+      const specialty = document.getElementById('specialtySelect').value;
+      const center = document.getElementById('centerSelect').value;
+      const doctorName = document.getElementById('doctorName').value;
+
+      // Validación
+      if (!ars || !city || !specialty) {
+        Swal.fire({
+          title: 'Campos requeridos',
+          text: 'Por favor completa ARS, Ciudad y Especialidad para continuar',
+          icon: 'warning',
+          confirmButtonColor: '#00A8E8'
+        });
+        return;
+      }
+
+      // Mostrar loading
+      Swal.fire({
+        title: 'Buscando doctores...',
+        text: 'Por favor espera mientras buscamos los mejores profesionales para ti',
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Intentar llamar al servidor
+      try {
+        const params = new URLSearchParams();
+        if (ars) params.append('ars', ars);
+        if (city) params.append('city', city);
+        if (specialty) params.append('specialty', specialty);
+        if (center) params.append('center', center);
+        if (doctorName) params.append('name', doctorName);
+
+        const resp = await fetch(`../php/doctors.php?${params.toString()}`);
+        if (resp.ok) {
+          const text = await resp.text();
+          if (!text || text.trim() === '') {
+            console.warn('doctors.php respondió vacío, usando fallback');
+          } else {
+            try {
+              const json = JSON.parse(text);
+              if (json.status === 'ok' && Array.isArray(json.doctors)) {
+                Swal.close();
+                return displayDoctorResultsFromArray(json.doctors);
+              }
+            } catch (parseErr) {
+              console.warn('No se pudo parsear JSON de doctors.php, usando fallback', parseErr);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Error calling php/doctors.php, using fallback', e);
+      }
+
+      // Fallback a la lógica previa con sampleDoctors (espera 1s para simular búsqueda)
+      setTimeout(() => {
+        Swal.close();
+        displayDoctorResults(ars, city, specialty, center, doctorName);
+      }, 800);
+    }
+
+    // Helper para renderizar cuando ya tenemos un array de doctores (desde servidor)
+    function displayDoctorResultsFromArray(doctorsArray) {
+      const resultsContainer = document.getElementById('resultsContainer');
+      const resultsContent = document.getElementById('resultsContent');
+
+      if (!doctorsArray || doctorsArray.length === 0) {
+        resultsContent.innerHTML = `
+          <div class="no-results">
+            <h3>😔 No se encontraron doctores</h3>
+            <p>No se encontraron doctores que coincidan con tus criterios de búsqueda.</p>
+            <button class="search-btn" onclick="clearDoctorSearch()" style="margin-top: 1rem;">🔄 Nueva Búsqueda</button>
+          </div>
+        `;
+      } else {
+        resultsContent.innerHTML = `
+          <div style="text-align: center; margin-bottom: 2rem;">
+            <h3 style="color: #00A8E8; margin-bottom: 0.5rem;">📋 ${doctorsArray.length} Doctor${doctorsArray.length > 1 ? 'es' : ''} Encontrado${doctorsArray.length > 1 ? 's' : ''}</h3>
+            <p style="color: #666;">Resultados que coinciden con tus criterios de búsqueda</p>
+          </div>
+          ${doctorsArray.map(doctor => `
+            <div class="doctor-card">
+              <div class="doctor-name">${doctor.name}</div>
+              <div class="doctor-info"><strong>📋 Especialidad:</strong> ${doctor.specialty}</div>
+              <div class="doctor-info"><strong>🏥 Centro:</strong> ${doctor.center || ''}</div>
+              <div class="doctor-info"><strong>📍 Ubicación:</strong> ${doctor.city || ''}</div>
+              <div class="doctor-info"><strong>📞 Teléfono:</strong> ${doctor.phone || ''}</div>
+              <div class="doctor-info"><strong>🕒 Horario:</strong> ${doctor.schedule || ''}</div>
+              <div class="doctor-info"><strong>⭐ Experiencia:</strong> ${doctor.experience || ''}</div>
+              <div class="doctor-actions">
+                <button class="action-btn" onclick="contactDoctor('${doctor.name}', '${doctor.phone || ''}')">📞 Llamar</button>
+                <button class="action-btn secondary" onclick="scheduleAppointment('${doctor.name}', '${doctor.email || ''}')">📅 Agendar Cita</button>
+                <button class="action-btn" onclick="sendEmail('${doctor.email || ''}', '${doctor.name}')">📧 Email</button>
+              </div>
+            </div>
+          `).join('')}
+        `;
+      }
+
+      resultsContainer.style.display = 'block';
+      resultsContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Función para mostrar resultados de doctores
+    function displayDoctorResults(ars, city, specialty, center, doctorName) {
+      // Los doctores deben provenir del servidor; aquí usamos un array vacío como fallback
+      // If you want local sample data for offline testing, populate this array with objects matching
+      // { name, specialty, center, city, ars: [...], phone, schedule, email, experience }
+      const sampleDoctors = [];
+
+      // Filtrar doctores basado en los criterios
+      let filteredDoctors = sampleDoctors.filter(doctor => {
+        let matchesArs = !ars || doctor.ars.includes(ars);
+        let matchesCity = !city || doctor.city.toLowerCase().includes(city.toLowerCase().replace('-', ' '));
+        let matchesSpecialty = !specialty || doctor.specialty.toLowerCase().includes(specialty.toLowerCase().replace('-', ' '));
+        let matchesCenter = !center || doctor.center.toLowerCase().includes(center.toLowerCase().replace('-', ' '));
+        let matchesName = !doctorName || doctor.name.toLowerCase().includes(doctorName.toLowerCase());
+        
+        return matchesArs && matchesCity && matchesSpecialty && matchesCenter && matchesName;
+      });
+
+      const resultsContainer = document.getElementById('resultsContainer');
+      const resultsContent = document.getElementById('resultsContent');
+      
+      if (filteredDoctors.length === 0) {
+        resultsContent.innerHTML = `
+          <div class="no-results">
+            <h3>😔 No se encontraron doctores</h3>
+            <p>No se encontraron doctores que coincidan con tus criterios de búsqueda.</p>
+            <p><strong>Sugerencias:</strong></p>
+            <ul style="text-align: left; max-width: 400px; margin: 1rem auto;">
+              <li>Verifica que hayas seleccionado correctamente tu ARS</li>
+              <li>Intenta con una ciudad cercana</li>
+              <li>Considera otras especialidades relacionadas</li>
+              <li>Deja el campo "Centro Médico" vacío para más opciones</li>
+            </ul>
+            <button class="search-btn" onclick="clearDoctorSearch()" style="margin-top: 1rem;">
+              🔄 Nueva Búsqueda
+            </button>
+          </div>
+        `;
+      } else {
+        resultsContent.innerHTML = `
+          <div style="text-align: center; margin-bottom: 2rem;">
+            <h3 style="color: #00A8E8; margin-bottom: 0.5rem;">
+              📋 ${filteredDoctors.length} Doctor${filteredDoctors.length > 1 ? 'es' : ''} Encontrado${filteredDoctors.length > 1 ? 's' : ''}
+            </h3>
+            <p style="color: #666;">Resultados que coinciden con tus criterios de búsqueda</p>
+          </div>
+          ${filteredDoctors.map(doctor => `
+            <div class="doctor-card">
+              <div class="doctor-name">${doctor.name}</div>
+              <div class="doctor-info">
+                <strong>📋 Especialidad:</strong> ${doctor.specialty}
+              </div>
+              <div class="doctor-info">
+                <strong>🏥 Centro:</strong> ${doctor.center}
+              </div>
+              <div class="doctor-info">
+                <strong>📍 Ubicación:</strong> ${doctor.city}
+              </div>
+              <div class="doctor-info">
+                <strong>📞 Teléfono:</strong> ${doctor.phone}
+              </div>
+              <div class="doctor-info">
+                <strong>🕒 Horario:</strong> ${doctor.schedule}
+              </div>
+              <div class="doctor-info">
+                <strong>⭐ Experiencia:</strong> ${doctor.experience}
+              </div>
+              <div class="doctor-actions">
+                <button class="action-btn" onclick="contactDoctor('${doctor.name}', '${doctor.phone}')">
+                  📞 Llamar
+                </button>
+                <button class="action-btn secondary" onclick="scheduleAppointment('${doctor.name}', '${doctor.email}')">
+                  📅 Agendar Cita
+                </button>
+                <button class="action-btn" onclick="sendEmail('${doctor.email}', '${doctor.name}')">
+                  📧 Email
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        `;
+      }
+      
+      resultsContainer.style.display = 'block';
+      
+      // Scroll hacia los resultados
+      resultsContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Función para contactar doctor
+    function contactDoctor(doctorName, phone) {
+      Swal.fire({
+        title: `📞 Contactar a ${doctorName}`,
+        html: `
+          <div style="text-align: left;">
+            <p><strong>Teléfono:</strong> ${phone}</p>
+            <p style="margin-top: 1rem;">¿Qué deseas hacer?</p>
+          </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#00A8E8',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '📞 Llamar Ahora',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = `tel:${phone}`;
+        }
+      });
+    }
+
+    // Función para agendar cita
+    function scheduleAppointment(doctorName, email) {
+      Swal.fire({
+        title: `📅 Agendar cita con ${doctorName}`,
+        html: `
+          <div style="text-align: left;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Fecha preferida:</label>
+            <input type="date" id="appointmentDate" class="swal2-input" style="margin-bottom: 1rem;" min="${new Date().toISOString().split('T')[0]}">
+            
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Hora preferida:</label>
+            <select id="appointmentTime" class="swal2-input" style="margin-bottom: 1rem;">
+              <option value="">Seleccionar hora...</option>
+              <option value="08:00">8:00 AM</option>
+              <option value="08:30">8:30 AM</option>
+              <option value="09:00">9:00 AM</option>
+              <option value="09:30">9:30 AM</option>
+              <option value="10:00">10:00 AM</option>
+              <option value="10:30">10:30 AM</option>
+              <option value="11:00">11:00 AM</option>
+              <option value="11:30">11:30 AM</option>
+              <option value="14:00">2:00 PM</option>
+              <option value="14:30">2:30 PM</option>
+              <option value="15:00">3:00 PM</option>
+              <option value="15:30">3:30 PM</option>
+              <option value="16:00">4:00 PM</option>
+              <option value="16:30">4:30 PM</option>
+              <option value="17:00">5:00 PM</option>
+            </select>
+            
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Motivo de consulta:</label>
+            <textarea id="appointmentReason" class="swal2-textarea" placeholder="Describe brevemente el motivo de tu consulta..."></textarea>
+            
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Tu teléfono:</label>
+            <input type="tel" id="patientPhone" class="swal2-input" placeholder="809-XXX-XXXX">
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonColor: '#00A8E8',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '📅 Solicitar Cita',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+          const date = document.getElementById('appointmentDate').value;
+          const time = document.getElementById('appointmentTime').value;
+          const reason = document.getElementById('appointmentReason').value;
+          const phone = document.getElementById('patientPhone').value;
+          
+          if (!date || !time || !reason || !phone) {
+            Swal.showValidationMessage('Por favor completa todos los campos');
+            return false;
+          }
+          
+          return { date, time, reason, phone };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: '✅ Solicitud enviada exitosamente',
+            html: `
+              <p>Tu solicitud de cita con <strong>${doctorName}</strong> ha sido enviada.</p>
+              <p><strong>Fecha:</strong> ${result.value.date}</p>
+              <p><strong>Hora:</strong> ${result.value.time}</p>
+              <p>Te contactaremos al <strong>${result.value.phone}</strong> para confirmar la disponibilidad.</p>
+              <p><em>Recibirás confirmación en las próximas 24 horas.</em></p>
+            `,
+            icon: 'success',
+            confirmButtonColor: '#00A8E8'
+          });
+        }
+      });
+    }
+
+    // Función para enviar email
+    function sendEmail(email, doctorName) {
+      const subject = encodeURIComponent(`Consulta médica - ${doctorName}`);
+      const body = encodeURIComponent(`Estimado/a ${doctorName},\n\nMe pongo en contacto con usted a través de la plataforma Farmacia Digital para solicitar información sobre...\n\nSaludos cordiales.`);
+      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    }
+
+    // Función para consulta a farmacéutico
+    function consultPharmacist(event) {
+      event.preventDefault();
+      
+      const consultType = document.getElementById('consultType').value;
+      const medicationName = document.getElementById('medicationName').value;
+      const description = document.getElementById('consultDescription').value;
+      const patientName = document.getElementById('patientName').value;
+      const phone = document.getElementById('phoneNumber').value;
+      const email = document.getElementById('emailAddress').value;
+
+      // Mostrar loading
+      Swal.fire({
+        title: 'Enviando consulta...',
+        text: 'Por favor espera mientras procesamos tu consulta',
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        timer: 2000
+      }).then(() => {
+        Swal.fire({
+          title: '✅ Consulta enviada exitosamente',
+          html: `
+            <div style="text-align: left;">
+              <p>Hola <strong>${patientName}</strong>,</p>
+              <p>Tu consulta sobre <strong>"${consultType}"</strong> ha sido recibida exitosamente.</p>
+              ${medicationName ? `<p><strong>Medicamento:</strong> ${medicationName}</p>` : ''}
+              <p><strong>Contacto:</strong> ${phone}</p>
+              ${email ? `<p><strong>Email:</strong> ${email}</p>` : ''}
+              <hr style="margin: 1rem 0;">
+              <p><strong>📞 Próximos pasos:</strong></p>
+              <ul>
+                <li>Nuestro farmacéutico especializado te contactará en las próximas 2 horas</li>
+                <li>Horario de atención: Lun-Vie 8:00 AM - 6:00 PM</li>
+                <li>Sábados: 8:00 AM - 2:00 PM</li>
+              </ul>
+              <p><em>Si es una emergencia, acude al centro médico más cercano.</em></p>
+            </div>
+          `,
+          icon: 'success',
+          confirmButtonColor: '#00A8E8',
+          confirmButtonText: 'Entendido'
+        }).then(() => {
+          // Limpiar formulario
+          document.getElementById('consultType').value = '';
+          document.getElementById('medicationName').value = '';
+          document.getElementById('consultDescription').value = '';
+          document.getElementById('patientName').value = '';
+          document.getElementById('phoneNumber').value = '';
+          document.getElementById('emailAddress').value = '';
+        });
+      });
+    }
+
+    // Función para limpiar búsqueda
+    function clearDoctorSearch() {
+      document.getElementById('arsSelect').value = '';
+      document.getElementById('citySelect').value = '';
+      document.getElementById('specialtySelect').value = '';
+      document.getElementById('centerSelect').value = '';
+      document.getElementById('doctorName').value = '';
+      document.getElementById('resultsContainer').style.display = 'none';
+    }
+
+    // Función para cerrar sesión
+    function logout() {
+      Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: '¿Estás seguro de que deseas cerrar sesión?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#00A8E8',
+        cancelButtonColor: '#dc3545',
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: 'Sesión cerrada',
+            text: 'Has cerrado sesión exitosamente',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1500
+          }).then(() => {
+            window.location.href = 'farmacia-digital-FONDO-Y-CATEGORIAS-ORIGINALES.html';
+          });
+        }
+      });
+    }
+
+    // Tecla Escape para cerrar menú
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeMenu();
+      }
+    });
+  </script>
+</body>
+</html>

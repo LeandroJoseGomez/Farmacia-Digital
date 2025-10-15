@@ -1,0 +1,91 @@
+/* Global responsive helpers for Farmacia Digital - mobile-first */
+
+/* Make media scale and images fluid */
+img, picture, video, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Design tokens / color variables (project-wide) */
+:root {
+  --primary-1: #00A8E8; /* bright cyan */
+  --primary-2: #00D9C0; /* teal */
+  --accent: #003D5C;    /* darker text accent */
+  --muted: #666666;
+}
+
+/* Fluid container defaults (can be overridden per-page) */
+.container {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Ensure inputs and buttons don't overflow */
+input, select, textarea, button {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Make tables scrollable on small screens */
+.responsive-table { width: 100%; overflow-x: auto; }
+
+/* Side menu adjustments: full-screen on small devices */
+.side-menu {
+  transition: transform 0.28s ease, left 0.28s ease;
+}
+
+@media (max-width: 800px) {
+  .side-menu { left: -100vw !important; width: 100vw !important; }
+  .side-menu.active { left: 0 !important; }
+  .menu-overlay { display: block; }
+}
+
+/* Navbar wrap and stacked items for narrow viewports */
+.navbar, .header-content {
+  flex-wrap: wrap;
+}
+
+/* General product grid tuning */
+.products-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  .container { padding: 12px; }
+  .products-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 420px) {
+  html { font-size: 14px; }
+  .menu-btn { padding: 6px 8px; }
+  .cart-btn { padding: 8px; }
+  .product-image { height: auto; }
+}
+
+/* Utility: hide overflowing decorative backgrounds on small screens */
+/* Utility: hide overflowing decorative backgrounds on small screens */
+body::before, body::after { max-width: 50vw; max-height: 50vh; }
+
+/* On small devices, avoid fixed-attachment backgrounds (performance and visual issues) */
+@media (max-width: 768px) {
+  body, .navbar, .welcome-section, .container { background-attachment: scroll !important; }
+  /* Remove large decorative pseudo-elements to save space */
+  body::before, body::after { display: none !important; }
+}
+
+/* Small helper to ensure clickable areas are touch-friendly */
+button, .menu-item a, .module-link { min-height: 44px; }
+
+/* Keep modals centered and fluid */
+.cart-content, .swal2-popup { width: 90%; max-width: 720px; }
+
+/* Keep forms single-column on small screens */
+@media (max-width: 600px) {
+  .form-row { grid-template-columns: 1fr !important; }
+}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Farmacia Digital</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo2.png">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+<body>
+
+  <!-- Elfsight AI Chatbot | Asistente Farmacia Digital -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-1b12611d-b7f6-4184-b3d6-911c87582fb9" data-elfsight-app-lazy></div>
+
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <img src="../assets/images/logo2.png" alt="Farmacia Digital" class="navbar-logo">
+      Farmacia Digital
+    </a>
+    <div class="navbar-user">
+      <div class="user-info">
+        <div class="user-name" id="userName"></div>
+        <div class="user-email" id="userEmail"></div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="welcome-section">
+      <h1>¡Bienvenido a Farmacia Digital!</h1>
+      <p>Gestiona tu salud de manera inteligente</p>
+    </div>
+
+    <div class="modules-grid">
+      <div class="module-card" onclick="navigateTo('perfil.html')">
+        <div class="module-icon">👤</div>
+        <div class="module-title">Perfil de Paciente</div>
+        <div class="module-description">
+          Gestiona tu información personal, historial médico y preferencias de salud de forma segura.
+        </div>
+        <a href="perfil.html" class="module-link">Acceder →</a>
+      </div>
+
+      <div class="module-card" onclick="navigateTo('gestion.html')">
+        <div class="module-icon">💊</div>
+        <div class="module-title">Gestión de Prescripciónes</div>
+        <div class="module-description">
+          Registra y administra tus medicamentos, recetas y tratamientos con recordatorios inteligentes.
+        </div>
+        <a href="gestion.html" class="module-link">Acceder →</a>
+      </div>
+
+      <div class="module-card" onclick="navigateTo('reportes.html')">
+        <div class="module-icon">📊</div>
+        <div class="module-title">Análisis de Prescripciónes con IA</div>
+        <div class="module-description">
+          Visualiza estadísticas de salud y recibe recomendaciones personalizadas generadas con IA.
+        </div>
+        <a href="reportes.html" class="module-link">Acceder →</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Obtener datos del usuario desde localStorage (modo offline)
+    (function() {
+      try {
+        let logged = localStorage.getItem('loggedUser');
+        if (!logged) {
+          window.location.href = "../index.html";
+          return;
+        }
+
+        let parsed = null;
+        try {
+          parsed = JSON.parse(logged);
+        } catch (e) {
+          parsed = logged;
+        }
+
+        let displayName = 'Usuario';
+        let displayEmail = '';
+        if (typeof parsed === 'object' && parsed !== null) {
+          displayName = parsed.nombre || parsed.name || parsed.correo || parsed.email || 'Usuario';
+          displayEmail = parsed.correo || parsed.email || '';
+          if ((parsed.nombre || parsed.name) && (parsed.correo || parsed.email)) {
+            displayName = (parsed.nombre || parsed.name) + (displayEmail ? ` (${displayEmail})` : '');
+          }
+        } else if (typeof parsed === 'string') {
+          displayName = parsed;
+        }
+
+        document.getElementById("userName").textContent = displayName;
+        document.getElementById("userEmail").textContent = displayEmail;
+      } catch (e) {
+        console.error('Error leyendo sesión local:', e);
+        window.location.href = "../index.html";
+      }
+    })();
+
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    // 🔹 Cerrar sesión
+    function logout() {
+      if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+        localStorage.removeItem('loggedUser');
+        window.location.href = "../index.html";
+      }
+    }
+  </script>
+
+</body>
+</html>
