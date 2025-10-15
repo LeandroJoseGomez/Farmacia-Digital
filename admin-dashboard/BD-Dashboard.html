@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Inventario - Farmacia Digital</title>
+  <link rel="stylesheet" href="../assets/css/BD-Dashboard.css" />
+  
+</head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<body>
+  <div class="sidebar">
+    <div class="logo">💊 Farmacia</div>
+    <nav class="menu">
+      <button class="menu-btn active">🏠</button>
+      <button class="menu-btn">📦</button>
+      <button class="menu-btn">📊</button>
+      <button class="menu-btn">⚙️</button>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <header class="header">
+      <div>
+        <h1>Bienvenido, Administrador</h1>
+        <p>Administra tu inventario, proveedores y ventas fácilmente.</p>
+      </div>
+      <button id="darkModeToggle" class="btn-modo">🌙 Modo Oscuro</button>
+    </header>
+
+
+      
+      <section class="analisis-section">
+  <h2>Análisis de Productos</h2>
+  <div class="analisis-container">
+    <!-- Columna izquierda: lista de productos -->
+    <div class="productos-lista">
+      <h3>Productos y Categorías</h3>
+      <table class="productos-tabla">
+        <thead>
+          <tr>
+            <th>Medicamento</th>
+            <th>Categoría</th>
+            <th>Precio (RD$)</th>
+            <th>Comparar</th>
+          </tr>
+        </thead>
+        <tbody id="productosTabla">
+          <!-- Se rellena dinámicamente desde JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Columna derecha: comparación -->
+    <div class="comparacion-card">
+      <h3>Comparación de Productos</h3>
+      <p>Selecciona dos medicamentos para comparar.</p>
+      <div id="comparacionContenido" class="comparacion-contenido">
+        <!-- Aquí aparecerá el análisis -->
+      </div>
+      <canvas id="comparacionChart"></canvas>
+    </div>
+  </div>
+</section>
+
+    <section class="dashboard-grid">
+      <!-- Gráfico de Ventas por Medicamento -->
+      <div class="card chart-card">
+        <div class="card-header">
+          <h3>Ventas Mensuales</h3>
+          <select id="productoSelect">
+            <option value="paracetamol">Paracetamol</option>
+            <option value="omeprazol">Omeprazol</option>
+            <option value="losartan">Losartán</option>
+            <option value="metformina">Metformina</option>
+            <option value="ibuprofeno">Ibuprofeno</option>
+            <option value="amoxicilina">Amoxicilina</option>
+            <option value="enalapril">Enalapril</option>
+            <option value="salbutamol">Salbutamol</option>
+            <option value="ranitidina">Ranitidina</option>
+            <option value="atenolol">Atenolol</option>
+          </select>
+
+        </div>
+        <canvas id="ventasChart"></canvas>
+      </div>
+
+      <!-- Diagrama de Pastel -->
+      <div class="card chart-card">
+        <div class="card-header">
+          <h3>Detalle de Ventas</h3>
+        </div>
+        <canvas id="ventasPieChart"></canvas>
+      </div>
+
+  <script src="../assets/js/script.js"></script>
+
+
+
+</body>
+</html>
