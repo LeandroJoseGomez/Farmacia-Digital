@@ -164,6 +164,7 @@
     .navbar-brand h1 {
       font-size: 1.5rem;
       font-weight: bold;
+      cursor: pointer;
     }
 
     .navbar-brand img {
@@ -301,10 +302,11 @@
     .filter-group select,
     .filter-group input {
       padding: 0.75rem;
-      border: 2px solid #e0e0e0;
+      border: 2px solid #e9ecef;
       border-radius: 10px;
-      font-size: 1rem;
+      font-size: 0.9rem;
       transition: all 0.3s ease;
+      background: white;
     }
 
     .filter-group select:focus,
@@ -317,18 +319,23 @@
     .filters-actions {
       display: flex;
       gap: 1rem;
-      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .filter-btn,
+    .clear-filters-btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
     }
 
     .filter-btn {
       background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
       color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
     }
 
     .filter-btn:hover {
@@ -337,27 +344,22 @@
     }
 
     .clear-filters-btn {
-      background: white;
-      color: #00A8E8;
-      border: 2px solid #00A8E8;
-      padding: 0.75rem 1.5rem;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
+      background: #f8f9fa;
+      color: #6c757d;
+      border: 2px solid #dee2e6;
     }
 
     .clear-filters-btn:hover {
-      background: #00A8E8;
-      color: white;
+      background: #e9ecef;
+      border-color: #adb5bd;
     }
 
-    /* Estadísticas rápidas */
+    /* Estadísticas de pedidos */
     .orders-stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
     }
 
     .stat-card {
@@ -367,7 +369,6 @@
       text-align: center;
       box-shadow: 0 5px 15px rgba(0,0,0,0.08);
       transition: all 0.3s ease;
-      border-left: 4px solid #00A8E8;
     }
 
     .stat-card:hover {
@@ -377,14 +378,13 @@
 
     .stat-icon {
       font-size: 3rem;
-      color: #00A8E8;
       margin-bottom: 1rem;
     }
 
     .stat-number {
       font-size: 2.5rem;
-      font-weight: bold;
-      color: #333;
+      font-weight: 700;
+      color: #00A8E8;
       margin-bottom: 0.5rem;
     }
 
@@ -398,26 +398,26 @@
     .orders-list {
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
     .order-card {
       background: white;
       border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
       overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
       transition: all 0.3s ease;
     }
 
     .order-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
 
     .order-header {
-      background: linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 217, 192, 0.1) 100%);
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
       padding: 1.5rem 2rem;
-      border-bottom: 1px solid #f0f0f0;
     }
 
     .order-header-content {
@@ -428,66 +428,54 @@
       gap: 1rem;
     }
 
-    .order-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .order-number {
+    .order-info h3 {
       font-size: 1.2rem;
-      font-weight: bold;
-      color: #00A8E8;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
     }
 
     .order-date {
-      color: #666;
+      opacity: 0.9;
       font-size: 0.9rem;
     }
 
     .order-status {
       padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
+      border-radius: 25px;
+      font-size: 0.8rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .status-pending {
-      background: #fff3cd;
+      background: #ffc107;
       color: #856404;
-      border: 1px solid #ffeaa7;
     }
 
     .status-processing {
-      background: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
+      background: #17a2b8;
+      color: white;
     }
 
     .status-shipped {
-      background: #cce5ff;
-      color: #004085;
-      border: 1px solid #99d6ff;
+      background: #fd7e14;
+      color: white;
     }
 
     .status-delivered {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
+      background: #28a745;
+      color: white;
     }
 
     .status-cancelled {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
+      background: #dc3545;
+      color: white;
     }
 
     .order-total {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #00A8E8;
+      font-size: 1.5rem;
+      font-weight: 700;
     }
 
     .order-body {
@@ -495,90 +483,110 @@
     }
 
     .order-products {
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .products-title {
+      font-size: 1.1rem;
+      color: #00A8E8;
+      margin-bottom: 1rem;
+      font-weight: 600;
     }
 
     .product-item {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 1rem 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .product-item:last-child {
-      border-bottom: none;
-    }
-
-    .product-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      justify-content: space-between;
+      padding: 1rem;
+      background: #f8f9fa;
       border-radius: 10px;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-info {
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.5rem;
-      flex-shrink: 0;
-    }
-
-    .product-details {
+      gap: 1rem;
       flex: 1;
     }
 
-    .product-name {
-      font-weight: bold;
-      margin-bottom: 0.25rem;
-      color: #333;
+    .product-icon {
+      font-size: 2rem;
+      width: 50px;
+      text-align: center;
     }
 
-    .product-description {
-      color: #666;
-      font-size: 0.9rem;
+    .product-details h4 {
+      font-size: 1rem;
+      color: #333;
       margin-bottom: 0.25rem;
+    }
+
+    .product-details p {
+      font-size: 0.9rem;
+      color: #666;
     }
 
     .product-quantity {
+      font-weight: 600;
       color: #00A8E8;
-      font-size: 0.9rem;
-      font-weight: 500;
+      margin: 0 1rem;
     }
 
     .product-price {
-      text-align: right;
-      font-weight: bold;
+      font-weight: 700;
       color: #333;
+      font-size: 1.1rem;
     }
 
-    .product-unit-price {
+    .order-details {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-label {
       font-size: 0.9rem;
       color: #666;
       margin-bottom: 0.25rem;
     }
 
-    .product-total-price {
-      font-size: 1.1rem;
-      color: #00A8E8;
+    .detail-value {
+      font-weight: 600;
+      color: #333;
     }
 
     .order-actions {
       display: flex;
       gap: 1rem;
-      flex-wrap: wrap;
       justify-content: flex-end;
-      border-top: 1px solid #f0f0f0;
-      padding-top: 1.5rem;
+      flex-wrap: wrap;
     }
 
     .action-btn {
       padding: 0.75rem 1.5rem;
-      border-radius: 25px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
       font-size: 0.9rem;
-      border: none;
     }
 
     .btn-primary {
@@ -592,87 +600,114 @@
     }
 
     .btn-secondary {
-      background: white;
-      color: #00A8E8;
-      border: 2px solid #00A8E8;
-    }
-
-    .btn-secondary:hover {
-      background: #00A8E8;
+      background: #6c757d;
       color: white;
     }
 
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+
     .btn-danger {
-      background: #ff4444;
+      background: #dc3545;
       color: white;
     }
 
     .btn-danger:hover {
-      background: #cc0000;
+      background: #c82333;
       transform: translateY(-2px);
     }
 
-    .btn-warning {
-      background: #ffc107;
+    /* Estado vacío */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.6;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
       color: #333;
+      margin-bottom: 1rem;
     }
 
-    .btn-warning:hover {
-      background: #e0a800;
+    .empty-state p {
+      color: #666;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .empty-state-btn {
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .empty-state-btn:hover {
       transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 168, 232, 0.3);
     }
 
     /* Modal del carrito */
     .cart-modal {
+      display: none;
       position: fixed;
-      top: 0;
+      z-index: 1000;
       left: 0;
+      top: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.6);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .cart-modal.active {
       display: flex;
-      justify-content: center;
       align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
+      justify-content: center;
     }
-    
-    .cart-modal.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    
+
     .cart-content {
-      background: white;
+      background-color: white;
       border-radius: 20px;
       padding: 2rem;
-      max-width: 600px;
       width: 90%;
+      max-width: 600px;
       max-height: 80vh;
       overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      position: relative;
+      animation: slideIn 0.3s ease;
     }
-    
+
     .cart-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
       padding-bottom: 1rem;
-      border-bottom: 2px solid #f0f0f0;
+      border-bottom: 2px solid #eee;
     }
-    
+
     .cart-title {
+      color: #00A8E8;
       font-size: 1.5rem;
-      font-weight: bold;
-      color: #333;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-weight: 700;
     }
-    
+
     .close-cart {
       background: none;
       border: none;
@@ -683,200 +718,196 @@
       border-radius: 50%;
       transition: all 0.3s ease;
     }
-    
+
     .close-cart:hover {
       background: #f0f0f0;
       color: #333;
     }
 
-    .carrito-vacio,
-    .carrito-productos,
-    .carrito-acciones,
-    .carrito-comprado {
-      margin-bottom: 1rem;
-    }
-
     .carrito-vacio {
       text-align: center;
-      padding: 2rem;
+      padding: 3rem;
       color: #666;
     }
 
-    .carrito-vacio .empty-cart-icon {
+    .empty-cart-icon {
       font-size: 3rem;
       margin-bottom: 1rem;
-      color: #ccc;
+      opacity: 0.6;
+    }
+
+    .carrito-productos {
+      margin-bottom: 1.5rem;
     }
 
     .carrito-producto {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 1rem 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .carrito-producto:last-child {
-      border-bottom: none;
-    }
-
-    .carrito-producto-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex: 1;
-    }
-
-    .carrito-producto-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
+      justify-content: space-between;
+      padding: 1rem;
+      background: #f8f9fa;
       border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.5rem;
-      flex-shrink: 0;
-    }
-
-    .carrito-producto-detalles {
-      flex: 1;
-    }
-
-    .carrito-producto-nombre {
-      font-weight: bold;
-      margin-bottom: 0.25rem;
-      color: #333;
-    }
-
-    .carrito-producto-descripcion {
-      color: #666;
-      font-size: 0.9rem;
-    }
-
-    .carrito-acciones {
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 2px solid #f0f0f0;
-    }
-
-    .carrito-acciones-izquierda {
       margin-bottom: 1rem;
     }
 
+    .carrito-producto-imagen {
+      font-size: 2rem;
+      width: 50px;
+      text-align: center;
+    }
+
+    .carrito-producto-info {
+      flex: 1;
+      margin-left: 1rem;
+    }
+
+    .carrito-producto-titulo {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+
+    .carrito-producto-descripcion {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .carrito-producto-precio {
+      font-weight: 700;
+      color: #00A8E8;
+      margin: 0 1rem;
+    }
+
+    .carrito-producto-cantidad {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 1rem;
+    }
+
+    .carrito-producto-cantidad button {
+      background: #00A8E8;
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .carrito-producto-cantidad span {
+      min-width: 30px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .carrito-producto-eliminar {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.9rem;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carrito-acciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 2px solid #eee;
+    }
+
+    .carrito-acciones.disabled {
+      display: none;
+    }
+
     .carrito-acciones-vaciar {
-      background: #ff4444;
+      background: #dc3545;
       color: white;
       border: none;
       padding: 0.75rem 1.5rem;
-      border-radius: 25px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.3s ease;
       font-weight: 500;
-    }
-
-    .carrito-acciones-vaciar:hover {
-      background: #cc0000;
     }
 
     .carrito-acciones-derecha {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 1rem;
     }
 
     .carrito-acciones-total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #333;
+      text-align: right;
+    }
+
+    .carrito-acciones-total p:first-child {
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    .carrito-acciones-total p:last-child {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00A8E8;
     }
 
     .carrito-acciones-comprar {
       background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
       color: white;
       border: none;
-      padding: 1rem 2rem;
-      border-radius: 25px;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.3s ease;
       font-weight: 500;
-      font-size: 1.1rem;
-    }
-
-    .carrito-acciones-comprar:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 168, 232, 0.3);
+      font-size: 1rem;
     }
 
     .carrito-comprado {
       text-align: center;
       padding: 2rem;
-      color: #28a745;
+      background: #d4edda;
+      border-radius: 10px;
+      margin-top: 1rem;
     }
 
-    .carrito-comprado .success-icon {
+    .carrito-comprado.disabled {
+      display: none;
+    }
+
+    .success-icon {
       font-size: 3rem;
+      color: #28a745;
       margin-bottom: 1rem;
     }
 
     .success-message {
-      color: #666;
+      color: #155724;
+      font-size: 0.9rem;
       margin-top: 0.5rem;
     }
 
-    .disabled {
-      display: none !important;
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    /* Estados vacíos */
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: #666;
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
-    .empty-state-icon {
-      font-size: 4rem;
-      margin-bottom: 1.5rem;
-      color: #ccc;
-    }
-
-    .empty-state h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: #333;
-    }
-
-    .empty-state p {
-      font-size: 1rem;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    .empty-state-btn {
-      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 100%);
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
-      font-size: 1rem;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .empty-state-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 168, 232, 0.3);
-    }
-
-    /* Alerta */
     .alert {
       position: fixed;
       top: 100px;
@@ -992,7 +1023,21 @@
 </head>
 <body>
   <div class="menu-overlay" id="menu-overlay"></div>
- 
+  
+  <!-- Menú lateral -->
+ <nav class="side-menu" id="side-menu">
+    <div class="menu-header">
+      <span class="menu-title">Menú</span>
+      <button class="close-btn" id="close-btn">&times;</button>
+    </div>
+    <ul class="menu-items">
+  <li class="menu-item"><a href="usuario-dashboard.html">🏠 Inicio</a></li>
+       <li class="menu-item"><a href="perfil.html">👤 Mi perfil</a></li>
+             <li class="menu-item"><a href="doctores.html">👨‍⚕ Buscar doctores</a></li>
+      <li class="menu-item"><a href="pedidos.html">📦 Mis Pedidos</a></li>
+      <li class="menu-item"><a href="contactos.html">📞 Contacto</a></li>
+    </ul>
+  </nav>
 
   <!-- Elfsight AI Chatbot | Asistente Farmacia Digital -->
 <script src="https://elfsightcdn.com/platform.js" async></script>
@@ -1000,6 +1045,8 @@
 
   <nav class="navbar">
     <div style="display: flex; align-items: center;">
+      <!-- Botón hamburguesa -->
+      <button class="menu-btn" id="menu-btn">☰</button>
       <div class="navbar-brand">
         <img src="../assets/images/logo2.png" alt="Farmacia Digital">
         <h1 onclick="location.href='usuario-dashboard.html'">Farmacia Digital</h1>
@@ -1084,14 +1131,7 @@
       <!-- Los pedidos se cargarán dinámicamente -->
     </div>
 
-    <!-- Estado vacío -->
-    <div class="empty-state" id="emptyState" style="display: none;">
-      <div class="empty-state-icon">📦</div>
-      <h3>No tienes pedidos aún</h3>
-      <p>¡Empieza a comprar tus medicamentos favoritos y aparecerán aquí!<br>Encuentra todo lo que necesitas en nuestro catálogo.</p>
-  <a href="usuario-dashboard.html" class="empty-state-btn">Ir al Catálogo</a>
-    </div>
-  </div>
+    
 
   <!-- Modal del carrito -->
   <div id="cartModal" class="cart-modal">
@@ -1148,157 +1188,123 @@
           { id: 2, name: 'Vitamina C 1000mg', description: 'Frasco con 60 cápsulas', icon: '🟡', quantity: 1, price: 14.01 }
         ],
         deliveryAddress: 'Av. Principal 123, Ciudad',
-        trackingNumber: 'TRK001234567890'
+        trackingNumber: 'TRK1728567890123'
       },
       {
         id: 'ORD-2024-002',
         date: '2024-10-12',
         status: 'shipped',
-        total: 89.50,
+        total: 89.97,
         products: [
-          { id: 3, name: 'Ibuprofeno 400mg', description: 'Caja con 30 tabletas', icon: '🔴', quantity: 1, price: 18.99 },
-          { id: 4, name: 'Complejo B', description: 'Frasco con 100 tabletas', icon: '🟠', quantity: 2, price: 35.25 }
+          { id: 3, name: 'Ibuprofeno 600mg', description: 'Caja con 30 tabletas', icon: '💊', quantity: 3, price: 29.99 }
         ],
         deliveryAddress: 'Calle Secundaria 456, Ciudad',
-        trackingNumber: 'TRK001234567891'
+        trackingNumber: 'TRK1728654321098'
       },
       {
         id: 'ORD-2024-003',
-        date: '2024-10-13',
+        date: '2024-10-14',
         status: 'processing',
-        total: 32.75,
+        total: 156.45,
         products: [
-          { id: 5, name: 'Jarabe para la Tos', description: 'Frasco 120ml sabor miel', icon: '🍯', quantity: 1, price: 12.99 },
-          { id: 6, name: 'Antihistamínico', description: 'Caja con 10 tabletas', icon: '🌿', quantity: 1, price: 19.76 }
+          { id: 4, name: 'Omeprazol 20mg', description: 'Caja con 28 cápsulas', icon: '💊', quantity: 2, price: 35.99 },
+          { id: 5, name: 'Complejo B', description: 'Frasco con 90 tabletas', icon: '💛', quantity: 1, price: 24.47 },
+          { id: 6, name: 'Calcio + Vitamina D', description: 'Frasco con 60 tabletas', icon: '⚪', quantity: 3, price: 32.00 }
         ],
         deliveryAddress: 'Av. Central 789, Ciudad',
-        trackingNumber: 'TRK001234567892'
+        trackingNumber: 'TRK1728741852963'
       }
     ];
 
-    // Intentar cargar pedidos del servidor para el usuario logueado
-    (async function fetchOrdersForUser() {
-      // Parsear loggedUser de forma robusta y extraer ID (soporta id, usuario_id, usuarioId)
-      let usuarioId = null;
-      try {
-        const raw = localStorage.getItem('loggedUser');
-        if (raw) {
-          let parsed = null;
-          try { parsed = JSON.parse(raw); } catch (e) { parsed = raw; }
-          if (parsed && typeof parsed === 'object') {
-            usuarioId = parsed.id || parsed.usuario_id || parsed.usuarioId || parsed.userId || null;
-          }
-        }
-      } catch (e) {
-        usuarioId = null;
-      }
-
-      if (usuarioId) {
-        try {
-          const resp = await fetch(`../php/orders.php?usuario_id=${usuarioId}`);
-          if (resp.ok) {
-            const text = await resp.text();
-            let json = null;
-            try {
-              json = text ? JSON.parse(text) : null;
-            } catch (parseErr) {
-              console.warn('No se pudo parsear JSON de orders.php', parseErr, text);
-            }
-            if (json && json.status === 'ok' && Array.isArray(json.orders)) {
-              // Mapear a estructura esperada por la UI
-              orders = json.orders.map(o => ({ id: o.id, date: o.created_at || o.date, status: o.status || 'pending', total: Number(o.total || 0), products: Array.isArray(o.items) ? o.items.map(it => ({ id: it.product_id, name: it.product_name || '', quantity: Number(it.cantidad || it.qty || 1), price: Number(it.precio || it.price || 0), description: '' })) : [] }));
-              filteredOrders = [...orders];
-              updateOrderStats();
-              renderOrders();
-              return;
-            }
-          }
-        } catch (e) {
-          console.warn('No se pudo obtener pedidos desde php/orders.php, usando fallback', e);
-        }
-      }
-
-      // Fallback local si el servidor no respondió o no hay usuario
-      orders = JSON.parse(localStorage.getItem('orders')) || [];
-      if (orders.length === 0) {
+    // Inicializar pedidos con datos de ejemplo si no hay datos guardados
+    function initializeOrders() {
+      const storedOrders = localStorage.getItem('orders');
+      if (!storedOrders || JSON.parse(storedOrders).length === 0) {
         orders = [...sampleOrders];
         localStorage.setItem('orders', JSON.stringify(orders));
+      } else {
+        orders = JSON.parse(storedOrders);
       }
       filteredOrders = [...orders];
-      updateOrderStats();
-      renderOrders();
-    })();
+    }
 
     function updateCartCount() {
-      document.getElementById('cartCount').textContent = cart.reduce((acc, item) => acc + item.cantidad, 0);
+      const count = cart.reduce((sum, item) => sum + item.cantidad, 0);
+      document.getElementById('cartCount').textContent = count;
     }
 
     function viewCart() {
-      const modal = document.getElementById('cartModal');
       mostrarCarrito();
-      modal.classList.add('show');
+      document.getElementById('cartModal').classList.add('active');
     }
 
     function closeCart() {
-      document.getElementById('cartModal').classList.remove('show');
+      document.getElementById('cartModal').classList.remove('active');
+      document.getElementById('carritoComprado').classList.add('disabled');
+      document.getElementById('carritoAcciones').classList.remove('disabled');
     }
 
     function mostrarCarrito() {
       const carritoVacio = document.getElementById('carritoVacio');
       const carritoProductos = document.getElementById('carritoProductos');
       const carritoAcciones = document.getElementById('carritoAcciones');
-      const carritoComprado = document.getElementById('carritoComprado');
-
-      carritoProductos.innerHTML = '';
 
       if (cart.length === 0) {
-        carritoVacio.classList.remove('disabled');
-        carritoAcciones.classList.add('disabled');
-        carritoComprado.classList.add('disabled');
-        return;
-      }
+        carritoVacio.style.display = 'block';
+        carritoProductos.style.display = 'none';
+        carritoAcciones.style.display = 'none';
+      } else {
+        carritoVacio.style.display = 'none';
+        carritoProductos.style.display = 'block';
+        carritoAcciones.style.display = 'flex';
 
-      carritoVacio.classList.add('disabled');
-      carritoAcciones.classList.remove('disabled');
-      carritoComprado.classList.add('disabled');
+        carritoProductos.innerHTML = '';
+        let total = 0;
 
-      cart.forEach((producto, index) => {
-        const div = document.createElement('div');
-        div.className = 'carrito-producto';
-        div.innerHTML = `
-          <div class="carrito-producto-info">
-            <div class="carrito-producto-icon">${producto.icon}</div>
-            <div class="carrito-producto-detalles">
-              <div class="carrito-producto-nombre">${producto.name}</div>
-              <div class="carrito-producto-descripcion">${producto.description}</div>
+        cart.forEach((producto, index) => {
+          const subtotal = producto.price * producto.cantidad;
+          total += subtotal;
+
+          const div = document.createElement('div');
+          div.classList.add('carrito-producto');
+          div.innerHTML = `
+            <div class="carrito-producto-imagen">${producto.icon}</div>
+            <div class="carrito-producto-info">
+              <h4 class="carrito-producto-titulo">${producto.name}</h4>
+              <p class="carrito-producto-descripcion">${producto.description}</p>
             </div>
-          </div>
-          <div style="text-align: center;">
-            <small>Cantidad: ${producto.cantidad}</small><br>
-            <strong>$${(producto.price * producto.cantidad).toFixed(2)}</strong>
-          </div>
-        `;
-        carritoProductos.appendChild(div);
-      });
+            <div class="carrito-producto-cantidad">
+              <button onclick="cambiarCantidad(${index}, -1)">-</button>
+              <span>${producto.cantidad}</span>
+              <button onclick="cambiarCantidad(${index}, 1)">+</button>
+            </div>
+            <div class="carrito-producto-precio">$${subtotal.toFixed(2)}</div>
+            <button class="carrito-producto-eliminar" onclick="eliminarDelCarrito(${index})">🗑️</button>
+          `;
+          carritoProductos.appendChild(div);
+        });
 
-      actualizarTotalCarrito();
+        document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+      }
     }
 
-    function actualizarTotalCarrito() {
-      const total = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
-      document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+    function cambiarCantidad(index, cambio) {
+      if (cart[index].cantidad + cambio > 0) {
+        cart[index].cantidad += cambio;
+      } else {
+        cart.splice(index, 1);
+      }
+      
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      mostrarCarrito();
     }
 
-    function updateOrderStats() {
-      const totalOrders = orders.length;
-      const totalSpent = orders.reduce((acc, order) => acc + order.total, 0);
-      const deliveredOrders = orders.filter(order => order.status === 'delivered').length;
-      const pendingOrders = orders.filter(order => ['pending', 'processing', 'shipped'].includes(order.status)).length;
-
-      document.getElementById('totalOrders').textContent = totalOrders;
-      document.getElementById('totalSpent').textContent = '$' + totalSpent.toFixed(2);
-      document.getElementById('deliveredOrders').textContent = deliveredOrders;
-      document.getElementById('pendingOrders').textContent = pendingOrders;
+    function eliminarDelCarrito(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      mostrarCarrito();
     }
 
     function getStatusText(status) {
@@ -1312,15 +1318,6 @@
       return statusMap[status] || status;
     }
 
-    function formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    }
-
     function renderOrders() {
       const ordersList = document.getElementById('ordersList');
       const emptyState = document.getElementById('emptyState');
@@ -1331,7 +1328,7 @@
         return;
       }
 
-      ordersList.style.display = 'flex';
+      ordersList.style.display = 'block';
       emptyState.style.display = 'none';
       ordersList.innerHTML = '';
 
@@ -1342,8 +1339,12 @@
           <div class="order-header">
             <div class="order-header-content">
               <div class="order-info">
-                <div class="order-number">Pedido ${order.id}</div>
-                <div class="order-date">Realizado el ${formatDate(order.date)}</div>
+                <h3>Pedido ${order.id}</h3>
+                <div class="order-date">📅 ${new Date(order.date).toLocaleDateString('es-ES', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</div>
               </div>
               <div class="order-status status-${order.status}">
                 ${getStatusText(order.status)}
@@ -1353,48 +1354,85 @@
           </div>
           <div class="order-body">
             <div class="order-products">
+              <h4 class="products-title">📦 Productos (${order.products.length})</h4>
               ${order.products.map(product => `
                 <div class="product-item">
-                  <div class="product-icon">${product.icon}</div>
-                  <div class="product-details">
-                    <div class="product-name">${product.name}</div>
-                    <div class="product-description">${product.description}</div>
-                    <div class="product-quantity">Cantidad: ${product.quantity}</div>
+                  <div class="product-info">
+                    <div class="product-icon">${product.icon}</div>
+                    <div class="product-details">
+                      <h4>${product.name}</h4>
+                      <p>${product.description}</p>
+                    </div>
                   </div>
-                  <div class="product-price">
-                    <div class="product-unit-price">$${product.price.toFixed(2)} c/u</div>
-                    <div class="product-total-price">$${(product.price * product.quantity).toFixed(2)}</div>
-                  </div>
+                  <div class="product-quantity">Cant: ${product.quantity}</div>
+                  <div class="product-price">$${(product.price * product.quantity).toFixed(2)}</div>
                 </div>
               `).join('')}
             </div>
+            <div class="order-details">
+              <h4 class="products-title">📋 Detalles del Pedido</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <div class="detail-label">📍 Dirección de Entrega</div>
+                  <div class="detail-value">${order.deliveryAddress}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">📋 Número de Seguimiento</div>
+                  <div class="detail-value">${order.trackingNumber}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">📊 Estado</div>
+                  <div class="detail-value">${getStatusText(order.status)}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">💰 Total</div>
+                  <div class="detail-value">$${order.total.toFixed(2)}</div>
+                </div>
+              </div>
+            </div>
             <div class="order-actions">
-              ${order.status === 'pending' ? `
+              ${order.status === 'pending' || order.status === 'processing' ? `
                 <button class="action-btn btn-danger" onclick="cancelOrder('${order.id}')">
-                  Cancelar Pedido
+                  ❌ Cancelar Pedido
+                </button>
+              ` : ''}
+              ${order.status === 'shipped' || order.status === 'delivered' ? `
+                <button class="action-btn btn-primary" onclick="trackOrder('${order.trackingNumber}')">
+                  📍 Rastrear Pedido
                 </button>
               ` : ''}
               ${order.status === 'delivered' ? `
-                <button class="action-btn btn-primary" onclick="reorderProducts('${order.id}')">
-                  Volver a Comprar
+                <button class="action-btn btn-secondary" onclick="reorderProducts('${order.id}')">
+                  🔄 Volver a Pedir
                 </button>
               ` : ''}
-              ${['shipped', 'processing'].includes(order.status) ? `
-                <button class="action-btn btn-secondary" onclick="trackOrder('${order.id}')">
-                  Rastrear Pedido
-                </button>
-              ` : ''}
-              <button class="action-btn btn-secondary" onclick="viewOrderDetails('${order.id}')">
-                Ver Detalles
-              </button>
-              <button class="action-btn btn-warning" onclick="downloadInvoice('${order.id}')">
-                Descargar Factura
+              <button class="action-btn btn-primary" onclick="downloadInvoice('${order.id}')">
+                📄 Descargar Factura
               </button>
             </div>
           </div>
         `;
         ordersList.appendChild(orderCard);
       });
+    }
+
+    function updateOrderStats() {
+      const totalOrdersEl = document.getElementById('totalOrders');
+      const totalSpentEl = document.getElementById('totalSpent');
+      const deliveredOrdersEl = document.getElementById('deliveredOrders');
+      const pendingOrdersEl = document.getElementById('pendingOrders');
+
+      const totalOrders = orders.length;
+      const totalSpent = orders.reduce((sum, order) => sum + order.total, 0);
+      const deliveredOrders = orders.filter(order => order.status === 'delivered').length;
+      const pendingOrders = orders.filter(order => 
+        order.status === 'pending' || order.status === 'processing' || order.status === 'shipped'
+      ).length;
+
+      totalOrdersEl.textContent = totalOrders;
+      totalSpentEl.textContent = `$${totalSpent.toFixed(2)}`;
+      deliveredOrdersEl.textContent = deliveredOrders;
+      pendingOrdersEl.textContent = pendingOrders;
     }
 
     function applyFilters() {
@@ -1426,7 +1464,7 @@
       });
 
       renderOrders();
-      showAlert(`Filtros aplicados. ${filteredOrders.length} pedidos encontrados.`);
+      showAlert('🔍 Filtros aplicados correctamente');
     }
 
     function clearFilters() {
@@ -1437,16 +1475,16 @@
       
       filteredOrders = [...orders];
       renderOrders();
-      showAlert('Filtros limpiados. Mostrando todos los pedidos.');
+      showAlert('🧹 Filtros eliminados');
     }
 
     function cancelOrder(orderId) {
       Swal.fire({
         title: '¿Cancelar pedido?',
-        text: '¿Estás seguro de que quieres cancelar este pedido?',
+        text: "Esta acción no se puede deshacer",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#ff4444',
+        confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Sí, cancelar',
         cancelButtonText: 'No cancelar'
@@ -1458,189 +1496,109 @@
             localStorage.setItem('orders', JSON.stringify(orders));
             applyFilters();
             updateOrderStats();
-            showAlert('Pedido cancelado exitosamente');
+            Swal.fire('Cancelado', 'Tu pedido ha sido cancelado', 'success');
           }
         }
       });
     }
 
-    function reorderProducts(orderId) {
-      const order = orders.find(order => order.id === orderId);
-      if (!order) return;
-
-      Swal.fire({
-        title: 'Agregar al carrito',
-        html: `
-          <p>¿Quieres agregar todos los productos de este pedido al carrito?</p>
-          <div style="text-align: left; margin-top: 15px;">
-            ${order.products.map(p => `
-              <div style="margin-bottom: 8px;">
-                ${p.icon} ${p.name} - Cantidad: ${p.quantity}
-              </div>
-            `).join('')}
-          </div>
-        `,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#00A8E8',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, agregar al carrito',
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          order.products.forEach(product => {
-            const existingItem = cart.find(item => item.id === product.id);
-            if (existingItem) {
-              existingItem.cantidad += product.quantity;
-            } else {
-              cart.push({
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                icon: product.icon,
-                price: product.price,
-                cantidad: product.quantity
-              });
-            }
-          });
-          
-          localStorage.setItem('cart', JSON.stringify(cart));
-          updateCartCount();
-          showAlert('Productos agregados al carrito exitosamente');
-        }
-      });
-    }
-
-    function trackOrder(orderId) {
-      const order = orders.find(order => order.id === orderId);
-      if (!order) return;
-
+    function trackOrder(trackingNumber) {
       Swal.fire({
         title: 'Rastreo de Pedido',
         html: `
-          <div style="text-align: left;">
-            <p><strong>Pedido:</strong> ${order.id}</p>
-            <p><strong>Estado:</strong> ${getStatusText(order.status)}</p>
-            <p><strong>Número de rastreo:</strong> ${order.trackingNumber}</p>
-            <p><strong>Dirección de entrega:</strong> ${order.deliveryAddress}</p>
-            <div style="margin-top: 20px;">
-              <h4>Estado del envío:</h4>
-              <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 10px;">
-                <p>📦 Pedido procesado - ✅</p>
-                <p>🚚 En camino - ${order.status === 'shipped' ? '✅' : '⏳'}</p>
-                <p>🏠 Entregado - ${order.status === 'delivered' ? '✅' : '⏳'}</p>
-              </div>
+          <div style="text-align: left; padding: 1rem;">
+            <p><strong>Número de seguimiento:</strong> ${trackingNumber}</p>
+            <br>
+            <div style="border-left: 3px solid #00A8E8; padding-left: 1rem;">
+              <p>✅ <strong>Pedido confirmado</strong> - ${new Date().toLocaleDateString()}</p>
+              <p>📦 <strong>En preparación</strong> - ${new Date().toLocaleDateString()}</p>
+              <p>🚚 <strong>En tránsito</strong> - ${new Date().toLocaleDateString()}</p>
+              <p>📍 <strong>En tu ciudad</strong> - Estimado para hoy</p>
             </div>
           </div>
         `,
         icon: 'info',
-        confirmButtonColor: '#00A8E8',
-        confirmButtonText: 'Cerrar'
+        confirmButtonColor: '#00A8E8'
       });
     }
 
-    function viewOrderDetails(orderId) {
+    function reorderProducts(orderId) {
       const order = orders.find(order => order.id === orderId);
-      if (!order) return;
-
-      Swal.fire({
-        title: 'Detalles del Pedido',
-        html: `
-          <div style="text-align: left;">
-            <h4>Información General</h4>
-            <p><strong>Pedido:</strong> ${order.id}</p>
-            <p><strong>Fecha:</strong> ${formatDate(order.date)}</p>
-            <p><strong>Estado:</strong> ${getStatusText(order.status)}</p>
-            <p><strong>Total:</strong> $${order.total.toFixed(2)}</p>
-            
-            <h4 style="margin-top: 20px;">Productos</h4>
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 10px;">
-              ${order.products.map(p => `
-                <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
-                  <strong>${p.icon} ${p.name}</strong><br>
-                  <small>${p.description}</small><br>
-                  <span>Cantidad: ${p.quantity} | Precio: $${p.price.toFixed(2)} | Subtotal: $${(p.price * p.quantity).toFixed(2)}</span>
-                </div>
-              `).join('')}
-            </div>
-            
-            <h4 style="margin-top: 20px;">Entrega</h4>
-            <p><strong>Dirección:</strong> ${order.deliveryAddress}</p>
-            ${order.trackingNumber ? <p><strong>Número de rastreo:</strong> ${order.trackingNumber}</p> : ''}
-          </div>
-        `,
-        icon: 'info',
-        confirmButtonColor: '#00A8E8',
-        confirmButtonText: 'Cerrar',
-        width: '600px'
-      });
+      if (order) {
+        order.products.forEach(product => {
+          const existingItem = cart.find(item => item.id === product.id);
+          if (existingItem) {
+            existingItem.cantidad += product.quantity;
+          } else {
+            cart.push({
+              id: product.id,
+              name: product.name,
+              description: product.description,
+              icon: product.icon,
+              price: product.price,
+              cantidad: product.quantity
+            });
+          }
+        });
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showAlert('🛒 Productos agregados al carrito');
+      }
     }
 
     function downloadInvoice(orderId) {
-      showAlert('Descargando factura...');
-      
+      showAlert('📄 Descargando factura...');
       // Simular descarga
       setTimeout(() => {
-        showAlert('Factura descargada exitosamente');
+        showAlert('✅ Factura descargada exitosamente');
       }, 2000);
     }
 
-    document.getElementById('vaciarCarrito').addEventListener('click', () => {
-      if (cart.length === 0) return;
-
-      Swal.fire({
-        title: '¿Vaciar carrito?',
-        text: 'Se eliminarán todos los productos del carrito',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#00A8E8',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, vaciar carrito',
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          cart = [];
-          localStorage.setItem('cart', JSON.stringify(cart));
-          updateCartCount();
-          mostrarCarrito();
-          showAlert('✓ Carrito vaciado');
-        }
-      });
+    // Eventos del carrito
+    document.getElementById('vaciarCarrito').addEventListener('click', function() {
+      if (cart.length > 0) {
+        Swal.fire({
+          title: '¿Vaciar carrito?',
+          text: "Se eliminarán todos los productos del carrito",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Sí, vaciar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            mostrarCarrito();
+            showAlert('🗑️ Carrito vaciado');
+          }
+        });
+      }
     });
 
-    document.getElementById('comprarAhora').addEventListener('click', () => {
-      if (cart.length === 0) return;
-
-      const total = cart.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+    document.getElementById('comprarAhora').addEventListener('click', function() {
+      if (cart.length === 0) {
+        showAlert('❌ El carrito está vacío');
+        return;
+      }
 
       Swal.fire({
-        title: 'Confirmar compra',
-        html: `
-          <div style="text-align: left;">
-            <p><strong>Resumen de tu compra:</strong></p>
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px 0;">
-              ${cart.map(p => 
-                `<div style="margin-bottom: 8px;">
-                  ${p.icon} ${p.name} - ${p.cantidad} x $${p.price.toFixed(2)} = <strong>$${(p.price * p.cantidad).toFixed(2)}</strong>
-                </div>`
-              ).join('')}
-            </div>
-            <p style="font-size: 1.2em; font-weight: bold; color: #00A8E8;">
-              Total: $${total.toFixed(2)}
-            </p>
-          </div>
-        `,
+        title: '¿Confirmar compra?',
+        text: `Total a pagar: $${cart.reduce((sum, item) => sum + (item.price * item.cantidad), 0).toFixed(2)}`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#00A8E8',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, confirmar compra',
-        cancelButtonText: 'Seguir comprando'
-      }).then(result => {
+        confirmButtonText: 'Confirmar compra',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
         if (result.isConfirmed) {
-          // Crear nuevo pedido
+          const total = cart.reduce((sum, item) => sum + (item.price * item.cantidad), 0);
           const newOrder = {
-            id: `ORD-2024-${String(orders.length + 1).padStart(3, '0')}`,
+            id: `ORD-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}`,
             date: new Date().toISOString().split('T')[0],
             status: 'pending',
             total: total,
@@ -1741,6 +1699,8 @@
         updateCartCount();
       };
       document.head.appendChild(s);
+      
+      initializeOrders();
       updateOrderStats();
       renderOrders();
     };
