@@ -1,91 +1,1022 @@
-/* Global responsive helpers for Farmacia Digital - mobile-first */
+/* ================================================
+   FARMACIA DIGITAL - RESPONSIVE STYLES
+   Archivo: assets/css/responsive.css
+   Descripción: Estilos responsivos para todas las páginas
+   ================================================ */
 
-/* Make media scale and images fluid */
-img, picture, video, svg {
+/* ================================================
+   VARIABLES RESPONSIVAS
+   ================================================ */
+:root {
+  --mobile-padding: 1rem;
+  --tablet-padding: 1.5rem;
+  --desktop-padding: 2rem;
+  --max-mobile: 480px;
+  --max-tablet: 768px;
+  --max-desktop: 1024px;
+}
+
+/* ================================================
+   RESET Y BASE RESPONSIVA
+   ================================================ */
+* {
+  box-sizing: border-box;
+}
+
+img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* Design tokens / color variables (project-wide) */
-:root {
-  --primary-1: #00A8E8; /* bright cyan */
-  --primary-2: #00D9C0; /* teal */
-  --accent: #003D5C;    /* darker text accent */
-  --muted: #666666;
+/* ================================================
+   TABLETS Y DISPOSITIVOS MEDIANOS (max-width: 1024px)
+   ================================================ */
+@media (max-width: 1024px) {
+  /* Contenedores generales */
+  .container,
+  .orders-container,
+  .contact-page-container {
+    max-width: 95%;
+    padding: 0 var(--tablet-padding);
+  }
+
+  /* Grids responsivos */
+  .categories-grid,
+  .insurance-grid,
+  .stats-grid,
+  .orders-stats,
+  .contact-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* Navbar */
+  .navbar,
+  .header {
+    padding: 1rem 1.5rem;
+  }
+
+  .navbar-brand h1,
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  /* Formularios */
+  .form-row,
+  .filters-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  /* Cards */
+  .product-card,
+  .order-card,
+  .doctor-card,
+  .insurance-card-container {
+    margin-bottom: 1rem;
+  }
+
+  /* Secciones */
+  .form-card,
+  .profile-card,
+  .analysis-card,
+  .chart-container,
+  .records-section,
+  .search-container,
+  .orders-filters {
+    padding: 2rem 1.5rem;
+  }
+
+  /* Headers de página */
+  .page-header h1,
+  .orders-header h1,
+  .contact-page-header h1 {
+    font-size: 2rem;
+  }
+
+  /* Dashboard de admin */
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analisis-container {
+    flex-direction: column;
+  }
+
+  .productos-lista,
+  .comparacion-card {
+    flex: 1 1 100%;
+  }
 }
 
-/* Fluid container defaults (can be overridden per-page) */
-.container {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px;
+/* ================================================
+   TABLETS PEQUEÑAS (max-width: 768px)
+   ================================================ */
+@media (max-width: 768px) {
+  /* Contenedores */
+  .container,
+  .orders-container,
+  .contact-page-container {
+    padding: 0 var(--mobile-padding);
+    margin: 1rem auto;
+  }
+
+  /* Grids a una columna */
+  .categories-grid,
+  .insurance-grid,
+  .stats-grid,
+  .orders-stats,
+  .contact-grid,
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Navbar y Header */
+  .navbar,
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .navbar-brand,
+  .header-left,
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .navbar-user,
+  .header-right {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .navbar-brand h1,
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .navbar-logo {
+    height: 35px;
+  }
+
+  /* Menú lateral */
+  .side-menu {
+    width: 250px;
+    left: -250px;
+  }
+
+  .menu-items {
+    font-size: 0.9rem;
+  }
+
+  /* Botones */
+  .logout-btn,
+  .cart-btn,
+  .btn-back,
+  .back-to-categories-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  /* Formularios */
+  .form-row,
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .filter-group select,
+  .filter-group input {
+    font-size: 0.95rem;
+    padding: 0.75rem;
+  }
+
+  .filters-actions {
+    flex-direction: column;
+  }
+
+  .filter-btn,
+  .clear-filters-btn {
+    width: 100%;
+  }
+
+  /* Cards y secciones */
+  .form-card,
+  .profile-card,
+  .analysis-card,
+  .chart-container,
+  .records-section,
+  .search-container,
+  .orders-filters,
+  .contact-form-section {
+    padding: 1.5rem 1rem;
+    border-radius: 15px;
+  }
+
+  /* Headers */
+  .page-header,
+  .orders-header,
+  .contact-page-header {
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+  }
+
+  .page-header h1,
+  .orders-header h1,
+  .contact-page-header h1,
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .page-header p,
+  .orders-header p,
+  .contact-page-header p,
+  .page-subtitle {
+    font-size: 0.95rem;
+  }
+
+  /* Productos */
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .product-card {
+    flex-direction: column;
+  }
+
+  .product-image {
+    width: 100%;
+    height: 150px;
+  }
+
+  /* Pedidos */
+  .order-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .order-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .product-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .product-price {
+    text-align: center;
+  }
+
+  /* Estadísticas */
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
+  }
+
+  /* Doctores */
+  .tabs-container {
+    flex-direction: column;
+    padding: 0.25rem;
+  }
+
+  .tab-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* Carrito modal */
+  .cart-modal {
+    padding: 1rem;
+  }
+
+  .cart-content {
+    width: 95%;
+    padding: 1.5rem;
+    max-height: 85vh;
+  }
+
+  .cart-title {
+    font-size: 1.2rem;
+  }
+
+  .carrito-producto {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .carrito-producto-info {
+    justify-content: center;
+  }
+
+  .carrito-acciones-derecha {
+    align-items: stretch;
+  }
+
+  .carrito-acciones-comprar,
+  .carrito-acciones-vaciar {
+    width: 100%;
+  }
+
+  /* Contacto */
+  .contact-card {
+    padding: 1.5rem;
+  }
+
+  .contact-icon-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+
+  .contact-icon {
+    font-size: 2rem;
+  }
+
+  /* Perfil */
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    font-size: 40px;
+  }
+
+  /* Análisis/Reportes */
+  .insight-item {
+    padding: 1rem;
+  }
+
+  .chart-bar {
+    margin-bottom: 1rem;
+  }
+
+  /* Gestión */
+  .record-item {
+    padding: 1rem;
+  }
+
+  /* Seguros */
+  .insurance-card {
+    min-height: 250px;
+  }
+
+  .insurance-front,
+  .insurance-back {
+    padding: 1.5rem;
+  }
+
+  .insurance-logo {
+    font-size: 2.5rem;
+  }
+
+  .insurance-name {
+    font-size: 1.1rem;
+  }
 }
 
-/* Ensure inputs and buttons don't overflow */
-input, select, textarea, button {
-  max-width: 100%;
-  box-sizing: border-box;
+/* ================================================
+   MÓVILES (max-width: 480px)
+   ================================================ */
+@media (max-width: 480px) {
+  /* Contenedores base */
+  .container,
+  .orders-container,
+  .contact-page-container {
+    padding: 0 0.75rem;
+    margin: 0.75rem auto;
+  }
+
+  /* Navbar ultra compacto */
+  .navbar,
+  .header {
+    padding: 0.75rem;
+  }
+
+  .navbar-brand,
+  .header-left {
+    gap: 0.5rem;
+  }
+
+  .navbar-brand h1,
+  .logo {
+    font-size: 1rem;
+  }
+
+  .navbar-logo {
+    height: 30px;
+  }
+
+  .user-info,
+  .navbar-user {
+    font-size: 0.85rem;
+  }
+
+  .cart-btn,
+  .logout-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .cart-count {
+    width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
+    top: -6px;
+    right: -6px;
+  }
+
+  /* Menú lateral más estrecho */
+  .side-menu {
+    width: 220px;
+    left: -220px;
+    padding: 15px;
+  }
+
+  .menu-title {
+    font-size: 1rem;
+  }
+
+  .menu-item a {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  /* Búsqueda */
+  .search-section {
+    padding: 0.75rem 0;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  }
+
+  .search-icon {
+    font-size: 1rem;
+    left: 0.75rem;
+  }
+
+  /* Headers de página */
+  .page-header h1,
+  .orders-header h1,
+  .contact-page-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-header p,
+  .orders-header p,
+  .contact-page-header p {
+    font-size: 0.85rem;
+  }
+
+  /* Categorías */
+  .category-card {
+    padding: 1.25rem;
+  }
+
+  .category-icon {
+    font-size: 2rem;
+  }
+
+  .category-title {
+    font-size: 1rem;
+  }
+
+  .category-description {
+    font-size: 0.8rem;
+  }
+
+  /* Productos */
+  .product-card {
+    padding: 1rem;
+  }
+
+  .product-name {
+    font-size: 1rem;
+  }
+
+  .product-description {
+    font-size: 0.8rem;
+  }
+
+  .product-price {
+    font-size: 1.1rem;
+  }
+
+  .add-to-cart-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  /* Cards generales */
+  .form-card,
+  .profile-card,
+  .analysis-card,
+  .chart-container,
+  .search-container,
+  .orders-filters {
+    padding: 1.25rem 0.75rem;
+    border-radius: 12px;
+  }
+
+  /* Formularios */
+  .form-group label {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-generate,
+  .submit-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Estadísticas */
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+  }
+
+  /* Pedidos */
+  .order-card {
+    border-radius: 12px;
+  }
+
+  .order-header {
+    padding: 1rem;
+  }
+
+  .order-number {
+    font-size: 1rem;
+  }
+
+  .order-date,
+  .order-status {
+    font-size: 0.8rem;
+  }
+
+  .order-body {
+    padding: 1rem;
+  }
+
+  .product-item {
+    padding: 0.75rem 0;
+  }
+
+  .product-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .product-name {
+    font-size: 0.9rem;
+  }
+
+  .product-description {
+    font-size: 0.75rem;
+  }
+
+  .action-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  /* Carrito */
+  .cart-content {
+    padding: 1.25rem;
+    border-radius: 15px;
+  }
+
+  .cart-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .cart-title {
+    font-size: 1.1rem;
+  }
+
+  .carrito-producto-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .carrito-producto-nombre {
+    font-size: 0.9rem;
+  }
+
+  .carrito-producto-descripcion {
+    font-size: 0.75rem;
+  }
+
+  /* Contacto */
+  .contact-card {
+    padding: 1.25rem;
+  }
+
+  .contact-title {
+    font-size: 1.1rem;
+  }
+
+  .contact-info {
+    font-size: 0.85rem;
+  }
+
+  /* Doctores */
+  .doctor-card {
+    padding: 1rem;
+  }
+
+  .doctor-name {
+    font-size: 1.1rem;
+  }
+
+  .doctor-info {
+    font-size: 0.85rem;
+  }
+
+  /* Seguros */
+  .insurance-card-container {
+    margin-bottom: 1rem;
+  }
+
+  .insurance-front,
+  .insurance-back {
+    padding: 1.25rem;
+  }
+
+  .insurance-logo {
+    font-size: 2rem;
+  }
+
+  .insurance-name {
+    font-size: 1rem;
+  }
+
+  .insurance-type {
+    font-size: 0.75rem;
+  }
+
+  .insurance-features li {
+    font-size: 0.8rem;
+  }
+
+  /* Análisis */
+  .insight-item {
+    padding: 0.875rem;
+  }
+
+  .insight-item h3 {
+    font-size: 0.95rem;
+  }
+
+  .insight-item p {
+    font-size: 0.85rem;
+  }
+
+  /* Gráficos */
+  .chart-progress {
+    height: 28px;
+  }
+
+  .chart-label {
+    font-size: 0.8rem;
+  }
+
+  /* Profile */
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+  }
+
+  .profile-header h1 {
+    font-size: 1.5rem;
+  }
+
+  /* Alertas */
+  .alert {
+    top: 80px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    font-size: 0.85rem;
+    padding: 12px 15px;
+  }
+
+  /* Empty states */
+  .empty-state,
+  .no-data,
+  .carrito-vacio {
+    padding: 2rem 1rem;
+  }
+
+  .empty-state-icon,
+  .no-data-icon {
+    font-size: 3rem;
+  }
+
+  .empty-state h3,
+  .no-data h3 {
+    font-size: 1.25rem;
+  }
+
+  .empty-state p,
+  .no-data p {
+    font-size: 0.85rem;
+  }
+
+  /* Botones de acción flotantes */
+  .floating-btn,
+  .menu-btn {
+    padding: 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  /* Tabs */
+  .tab-button {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  /* Admin dashboard */
+  .sidebar {
+    width: 60px;
+  }
+
+  .sidebar:hover {
+    width: 150px;
+  }
+
+  .menu-btn {
+    font-size: 1.1rem;
+  }
+
+  /* Tablas */
+  .productos-tabla {
+    font-size: 0.8rem;
+  }
+
+  .productos-tabla th,
+  .productos-tabla td {
+    padding: 8px 6px;
+  }
 }
 
-/* Make tables scrollable on small screens */
-.responsive-table { width: 100%; overflow-x: auto; }
+/* ================================================
+   MÓVILES EXTRA PEQUEÑOS (max-width: 360px)
+   ================================================ */
+@media (max-width: 360px) {
+  /* Ajustes extremos para pantallas muy pequeñas */
+  .container {
+    padding: 0 0.5rem;
+  }
 
-/* Side menu adjustments: full-screen on small devices */
-.side-menu {
-  transition: transform 0.28s ease, left 0.28s ease;
+  .navbar,
+  .header {
+    padding: 0.5rem;
+  }
+
+  .navbar-brand h1,
+  .logo {
+    font-size: 0.9rem;
+  }
+
+  .page-header h1,
+  .orders-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .category-card,
+  .stat-card,
+  .insurance-card {
+    padding: 1rem;
+  }
+
+  .form-card,
+  .profile-card {
+    padding: 1rem 0.5rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-size: 0.85rem;
+    padding: 0.65rem 1.25rem;
+  }
+
+  .cart-content {
+    padding: 1rem;
+  }
+
+  .side-menu {
+    width: 200px;
+    left: -200px;
+  }
 }
 
-@media (max-width: 800px) {
-  .side-menu { left: -100vw !important; width: 100vw !important; }
-  .side-menu.active { left: 0 !important; }
-  .menu-overlay { display: block; }
+/* ================================================
+   LANDSCAPE MÓVIL (max-height: 500px)
+   ================================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .navbar,
+  .header {
+    padding: 0.5rem 1rem;
+  }
+
+  .page-header {
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .page-header p {
+    font-size: 0.85rem;
+  }
+
+  .cart-content,
+  .modal-content {
+    max-height: 90vh;
+  }
+
+  .stat-card,
+  .category-card {
+    padding: 1rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
 }
 
-/* Navbar wrap and stacked items for narrow viewports */
-.navbar, .header-content {
+/* ================================================
+   IMPRESIÓN
+   ================================================ */
+@media print {
+  .navbar,
+  .header,
+  .side-menu,
+  .menu-overlay,
+  .cart-btn,
+  .logout-btn,
+  .floating-btn,
+  .search-section,
+  .alert,
+  .elfsight-app-1b12611d-b7f6-4184-b3d6-911c87582fb9 {
+    display: none !important;
+  }
+
+  .container,
+  .orders-container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .product-card,
+  .order-card,
+  .stat-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* ================================================
+   UTILIDADES RESPONSIVAS
+   ================================================ */
+
+/* Ocultar en móvil */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Ocultar en desktop */
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* Texto responsivo */
+.text-responsive {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.heading-responsive {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+/* Espaciado responsivo */
+.spacing-responsive {
+  padding: clamp(1rem, 3vw, 2rem);
+  margin: clamp(0.5rem, 2vw, 1rem);
+}
+
+/* Grid responsivo automático */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 1rem;
+}
+
+/* Flex responsivo */
+.flex-responsive {
+  display: flex;
   flex-wrap: wrap;
-}
-
-/* General product grid tuning */
-.products-grid {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
 
 @media (max-width: 768px) {
-  html { font-size: 15px; }
-  .container { padding: 12px; }
-  .products-grid { grid-template-columns: 1fr; }
+  .flex-responsive {
+    flex-direction: column;
+  }
 }
 
-@media (max-width: 420px) {
-  html { font-size: 14px; }
-  .menu-btn { padding: 6px 8px; }
-  .cart-btn { padding: 8px; }
-  .product-image { height: auto; }
+/* Container fluido */
+.container-fluid {
+  width: 100%;
+  padding-left: clamp(0.5rem, 5vw, 2rem);
+  padding-right: clamp(0.5rem, 5vw, 2rem);
 }
 
-/* Utility: hide overflowing decorative backgrounds on small screens */
-/* Utility: hide overflowing decorative backgrounds on small screens */
-body::before, body::after { max-width: 50vw; max-height: 50vh; }
+/* Aspect ratio responsivo */
+.aspect-ratio-16-9 {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
 
-/* On small devices, avoid fixed-attachment backgrounds (performance and visual issues) */
+.aspect-ratio-1-1 {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+}
+
+/* Touch targets mínimos */
 @media (max-width: 768px) {
-  body, .navbar, .welcome-section, .container { background-attachment: scroll !important; }
-  /* Remove large decorative pseudo-elements to save space */
-  body::before, body::after { display: none !important; }
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
-/* Small helper to ensure clickable areas are touch-friendly */
-button, .menu-item a, .module-link { min-height: 44px; }
-
-/* Keep modals centered and fluid */
-.cart-content, .swal2-popup { width: 90%; max-width: 720px; }
-
-/* Keep forms single-column on small screens */
-@media (max-width: 600px) {
-  .form-row { grid-template-columns: 1fr !important; }
-}
+/* ================================================
+   FIN DEL ARCHIVO RESPONSIVE.CSS
+   ================================================ */

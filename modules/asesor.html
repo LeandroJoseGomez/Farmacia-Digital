@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asesor del Proyecto - Farmacia Digital</title>
+  <style>
+    /* ===== Estilos base (idénticos al ejemplo dado) ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-1: #00A8E8;
+      --primary-2: #00D9C0;
+      --accent: #003D5C;
+      --muted: #666666;
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #00A8E8 0%, #00D9C0 50%, #7FDBFF 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      top: -250px;
+      right: -250px;
+      animation: float 20s infinite ease-in-out;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      bottom: -200px;
+      left: -200px;
+      animation: float 15s infinite ease-in-out reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(30px, 30px) rotate(180deg); }
+    }
+
+    .container {
+      background: #fff;
+      width: clamp(320px, 92vw, 420px);
+      padding: 28px 22px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      animation: slideIn 0.6s ease-out;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--primary-1);
+      box-shadow: 0 4px 15px rgba(0,168,232,0.3);
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      color: var(--accent);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p.role {
+      color: var(--primary-1);
+      font-weight: 600;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    p.description {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      padding: 0 10px;
+    }
+
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary-1) 0%, var(--primary-2) 100%);
+      color: white;
+      text-decoration: none;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,168,232,0.3);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,168,232,0.4);
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 22px 18px; }
+      h2 { font-size: 20px; }
+      .profile-pic { width: 100px; height: 100px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Elfsight AI Chatbot | Asistente Farmacia Digital -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-1b12611d-b7f6-4184-b3d6-911c87582fb9" data-elfsight-app-lazy></div>
+
+  <div class="container">
+    <img src="../assets/images/imgAsesor.jpeg" alt="Foto del Asesor" class="profile-pic">
+    <h2>Lic. Martha Marte</h2>
+    <p class="role">Asesor del Proyecto Farmacia Digital</p>
+    <p class="description">
+      Licenciada en Fármaco-Bioquímica egresada de la Universidad Tecnológica de Santiago (UTESA) Cede, 
+      Desempeña el rol de encargada de medicamentos en el Servicio Regional de Salud Cibao Noroeste (SRSCNO).
+    </p>
+    <a href="usuario-dashboard.html" class="button">Volver al inicio</a>
+  </div>
+</body>
+</html>

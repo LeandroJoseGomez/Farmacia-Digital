@@ -1,79 +1,98 @@
 <?php
-// CORS: permitir orígenes (para facilitar desarrollo y hospedajes que redirigen)
-if (isset($_SERVER['HTTP_ORIGIN'])) {
-    // permitir el origen que hizo la petición
-    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-} else {
-    header('Access-Control-Allow-Origin: *');
-}
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-// Siempre devolver JSON
-header('Content-Type: application/json; charset=utf-8');
-
-// Responder rápido a preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
-// No mostrar errores crudos en producción
-ini_set('display_errors', '0');
-error_reporting(E_ALL);
-
-// Manejador de excepciones que devuelve JSON
-set_exception_handler(function ($e) {
-    http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'Unhandled exception', 'detail' => $e->getMessage()]);
-    exit;
-});
-
-// Capturar cualquier output inesperado y asegurarnos de devolver JSON válido
+// Desactivar cualquier salida previa
 ob_start();
+
+// Configuración de errores
+ini_set('display_errors', 0);
+error_reporting(0);
+
+// Headers CORS - IMPORTANTE: deben ir antes de cualquier salida
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json; charset=UTF-8");
+
+// Limpiar cualquier salida previa
+ob_clean();
+
 try {
-    require_once __DIR__ . '/conection.php';
+    // Datos de conexión
+    $servername = "sql211.infinityfree.com";
+    $username = "if0_40139405";
+    $password = "JvRrZIzwFwE";
+    $dbname = "if0_40139405_FarmaciaDigitalBD";
 
-    // Devuelve lista de productos (opcional parámetro category)
-    $category = isset($_GET['category']) ? $_GET['category'] : null;
-
-    if ($category) {
-        $sql = "SELECT id, name, price, category, description, icon FROM products WHERE category = ?";
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) throw new Exception($conn->error);
-        $stmt->bind_param('s', $category);
-    } else {
-        $sql = "SELECT id, name, price, category, description, icon FROM products";
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) throw new Exception($conn->error);
+    // Crear conexión
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Verificar conexión
+    if ($conn->connect_error) {
+        throw new Exception("Error de conexión: " . $conn->connect_error);
     }
 
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $products = [];
-    while ($row = $result->fetch_assoc()) {
-        $products[] = $row;
+    // Establecer charset
+    $conn->set_charset("utf8mb4");
+
+    // Consulta SQL
+    $sql = "SELECT id, name, price, category, description, icon FROM products";
+    $result = $conn->query($sql);
+
+    if (!$result) {
+        throw new Exception("Error en la consulta: " . $conn->error);
     }
 
-    // Limpiar cualquier output previo (warnings u otro HTML)
-    $buffer = ob_get_clean();
-    // Si hubo output no deseado, lo registramos en 'detail' (sin exponer datos sensibles)
-    if ($buffer && trim($buffer) !== '') {
-        // No incluir buffer completo en producción; incluir indicación breve
-        error_log("products.php: unexpected output from includes: " . substr($buffer, 0, 1000));
+    // Recopilar productos
+    $products = array();
+    
+   if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            // Asignar icono según categoría
+            $icon = match (strtolower($row['category'])) {
+                'vitaminas' => '🍊',
+                'antibioticos' => '💉',
+                'analgesicos' => '💊',
+                'dermatologicos' => '🧴',
+                'respiratorios' => '💨',
+                'digestivos' => '🍽️',
+                default => '⚕️'
+            };
+
+            $products[] = array(
+                'id' => (int)$row['id'],
+                'name' => $row['name'],
+                'price' => (float)$row['price'],
+                'category' => $row['category'],
+                'description' => $row['description'] ?? '',
+                'icon' => $icon
+            );
+        }
     }
 
-    echo json_encode(['status' => 'ok', 'products' => $products]);
-
-    $stmt->close();
+    // Cerrar conexión
     $conn->close();
-    exit;
+
+    // Preparar respuesta
+    $response = array(
+        "status" => "ok",
+        "count" => count($products),
+        "products" => $products,
+        "timestamp" => date('Y-m-d H:i:s')
+    );
+
+    // Enviar respuesta
+    echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
 } catch (Exception $e) {
-    // Desechamos cualquier buffer y respondemos en JSON
-    if (ob_get_level()) ob_end_clean();
-    http_response_code(500);
-    $detail = $e->getMessage();
-    error_log('products.php error: ' . $detail);
-    echo json_encode(['status' => 'error', 'message' => 'Error retrieving products', 'detail' => $detail]);
-    if (isset($stmt) && $stmt) $stmt->close();
-    if (isset($conn) && $conn) $conn->close();
-    exit;
+    // En caso de error, enviar respuesta de error
+    $error_response = array(
+        "status" => "error",
+        "message" => $e->getMessage(),
+        "timestamp" => date('Y-m-d H:i:s')
+    );
+    
+    echo json_encode($error_response, JSON_UNESCAPED_UNICODE);
 }
+
+// Finalizar buffer
+ob_end_flush();
+?>

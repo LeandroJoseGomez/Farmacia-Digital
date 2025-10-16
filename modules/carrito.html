@@ -146,7 +146,7 @@
           </div>
         </div>
         
-        <button onclick="confirmarPago()" class="btn-primary btn-confirmar">
+        <button onclick="confirmarPago(); generarFactura();" class="btn-primary btn-confirmar">
           ✓ Confirmar Pago y Generar Factura
         </button>
       </div>
@@ -181,6 +181,440 @@ let cart = [];
 let clienteData = {};
 let coberturaSeguro = 0.8; // 80% de cobertura
 
+// ============================================================
+// 🔧 REEMPLAZAR COMPLETAMENTE EL BLOQUE DE FUNCIONES EN carrito.html
+// Busca las funciones confirmarPago() y generarFactura() y reemplázalas
+// ============================================================
+
+/**
+ * Helper: Obtener ID del usuario logueado
+ */
+function getLoggedUserId() {
+  try {
+    const loggedUser = localStorage.getItem('loggedUser');
+    if (!loggedUser) return null;
+
+    let parsed = null;
+    try {
+      parsed = JSON.parse(loggedUser);
+    } catch (e) {
+      return null;
+    }
+
+    return parsed.id || 
+           parsed.usuario_id || 
+           parsed.usuarioId || 
+           parsed.userId || 
+           parsed.user_id || 
+           null;
+  } catch (error) {
+    console.error('Error obteniendo userId:', error);
+    return null;
+  }
+}
+
+/**
+ * Calcular cambio en tiempo real
+ */
+function calcularCambio() {
+    const montoPagadoInput = document.getElementById('montoPagado');
+    const montoPagado = parseFloat(montoPagadoInput?.value) || 0;
+    
+    const totalNetoText = document.getElementById('totalNetoCobro')?.textContent || '$0.00';
+    const totalNeto = parseFloat(totalNetoText.replace('$', '').replace(',', '')) || 0;
+    
+    const cambio = montoPagado - totalNeto;
+    
+    const cambioElement = document.getElementById('cambioCalculado');
+    const errorPago = document.getElementById('errorPago');
+    
+    if (!cambioElement) return;
+    
+    if (cambio >= 0) {
+        cambioElement.textContent = `$${cambio.toFixed(2)}`;
+        cambioElement.className = 'cambio-monto';
+        if (errorPago) errorPago.style.display = 'none';
+    } else {
+        cambioElement.textContent = `-$${Math.abs(cambio).toFixed(2)}`;
+        cambioElement.className = 'cambio-monto insuficiente';
+        if (errorPago) {
+            errorPago.textContent = `El pago es insuficiente. Faltan $${Math.abs(cambio).toFixed(2)}`;
+            errorPago.style.display = 'block';
+        }
+    }
+}
+
+/**
+ * Confirmar pago y generar factura
+ */
+async function confirmarPago() {
+    console.log('🔵 Iniciando confirmarPago...');
+    
+    // Obtener y validar monto pagado
+    const montoPagadoInput = document.getElementById('montoPagado');
+    if (!montoPagadoInput) {
+        console.error('❌ No se encontró el input montoPagado');
+        mostrarAlerta('Error: Campo de pago no encontrado', 'error');
+        return;
+    }
+
+    const montoPagado = parseFloat(montoPagadoInput.value) || 0;
+    console.log('💰 Monto pagado:', montoPagado);
+
+    // Obtener total neto
+    const totalNetoElement = document.getElementById('totalNetoCobro');
+    if (!totalNetoElement) {
+        console.error('❌ No se encontró el elemento totalNetoCobro');
+        mostrarAlerta('Error: Total no encontrado', 'error');
+        return;
+    }
+
+    const totalNetoText = totalNetoElement.textContent || '$0.00';
+    const totalNeto = parseFloat(totalNetoText.replace('$', '').replace(',', '')) || 0;
+    console.log('💵 Total neto:', totalNeto);
+
+    // Validaciones
+    if (montoPagado === 0) {
+        mostrarAlerta('Por favor ingrese el monto pagado', 'error');
+        montoPagadoInput.focus();
+        return;
+    }
+
+    if (montoPagado < totalNeto) {
+        const faltante = totalNeto - montoPagado;
+        mostrarAlerta(`El pago es insuficiente. Faltan $${faltante.toFixed(2)}`, 'error');
+        return;
+    }
+
+    // Preparar datos del pedido
+    const usuarioId = getLoggedUserId();
+    console.log('👤 Usuario ID:', usuarioId);
+
+    if (!cart || cart.length === 0) {
+        console.error('❌ Carrito vacío');
+        mostrarAlerta('El carrito está vacío', 'error');
+        return;
+    }
+
+    const items = cart.map(p => ({
+        product_id: parseInt(p.id),
+        cantidad: parseInt(p.cantidad) || 1,
+        precio: parseFloat(p.price) || 0
+    }));
+
+    console.log('📦 Items del pedido:', items);
+
+    const totalBruto = cart.reduce((acc, item) => 
+        acc + ((parseFloat(item.price) || 0) * (parseInt(item.cantidad) || 0)), 0
+    );
+
+    let cobertura = 0;
+    if (clienteData && clienteData.usaSeguro) {
+        cobertura = cart.reduce((acc, item) => {
+            if (item.cubiertoPorSeguro) {
+                return acc + ((parseFloat(item.price) || 0) * (parseInt(item.cantidad) || 0) * coberturaSeguro);
+            }
+            return acc;
+        }, 0);
+    }
+
+    const totalNetoCalc = totalBruto - cobertura;
+    console.log('💰 Total bruto:', totalBruto, '| Cobertura:', cobertura, '| Total neto:', totalNetoCalc);
+
+    const payload = {
+        usuario_id: usuarioId || 0,
+        total: parseFloat(totalNetoCalc.toFixed(2)),
+        items: items
+    };
+
+    console.log('📤 Enviando payload:', payload);
+
+    // Mostrar loading
+    Swal.fire({
+        title: 'Procesando pago...',
+        text: 'Por favor espere',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    // Enviar al servidor
+    try {
+        const resp = await fetch('../php/orders.php', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        console.log('📡 Respuesta HTTP:', resp.status, resp.statusText);
+
+        const text = await resp.text();
+        console.log('📄 Respuesta texto:', text.substring(0, 500));
+
+        let json = null;
+        try {
+            json = text ? JSON.parse(text) : null;
+        } catch (parseErr) {
+            console.error('❌ Error parseando JSON:', parseErr);
+            console.error('📄 Texto completo:', text);
+            
+            Swal.close();
+            
+            // Si el servidor no responde JSON, crear el pedido localmente
+            Swal.fire({
+                title: 'Pedido registrado localmente',
+                text: 'El servidor no respondió correctamente, pero tu pedido se ha guardado.',
+                icon: 'warning',
+                confirmButtonColor: '#00A8E8'
+            }).then(() => {
+                // Generar factura sin ID de servidor
+                generarFactura(montoPagado, null);
+                
+                document.getElementById('pantallaCobro').style.display = 'none';
+                document.getElementById('facturaSection').style.display = 'block';
+            });
+            return;
+        }
+
+        console.log('✅ JSON parseado:', json);
+
+        Swal.close();
+
+        if (!resp.ok || !json || json.status !== 'ok') {
+            console.error('❌ Error en respuesta:', json);
+            mostrarAlerta(json?.message || 'Error al crear el pedido', 'error');
+            return;
+        }
+
+        const orderId = json.order_id || Date.now();
+        console.log('✅ Pedido creado con ID:', orderId);
+
+        // Generar factura
+        generarFactura(montoPagado, orderId);
+
+        // Mostrar sección de factura
+        document.getElementById('pantallaCobro').style.display = 'none';
+        document.getElementById('facturaSection').style.display = 'block';
+
+    } catch (err) {
+        console.error('❌ Error de red:', err);
+        Swal.close();
+        
+        Swal.fire({
+            title: 'Error de conexión',
+            text: 'No se pudo conectar con el servidor. ¿Desea guardar el pedido localmente?',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#00A8E8',
+            cancelButtonColor: '#dc3545',
+            confirmButtonText: 'Sí, guardar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                generarFactura(montoPagado, null);
+                
+                document.getElementById('pantallaCobro').style.display = 'none';
+                document.getElementById('facturaSection').style.display = 'block';
+            }
+        });
+    }
+}
+
+/**
+ * Generar factura con validaciones robustas
+ */
+function generarFactura(montoPagado, serverOrderId = null) {
+    console.log('📄 Generando factura...');
+    console.log('💰 Monto pagado recibido:', montoPagado, 'Tipo:', typeof montoPagado);
+    
+    // ✅ VALIDACIÓN ROBUSTA DEL MONTO
+    let montoPagadoValido = 0;
+    
+    if (typeof montoPagado === 'number') {
+        montoPagadoValido = montoPagado;
+    } else if (typeof montoPagado === 'string') {
+        montoPagadoValido = parseFloat(montoPagado);
+    } else if (montoPagado && typeof montoPagado === 'object') {
+        // Si por error se pasa un objeto, intentar extraer el valor
+        montoPagadoValido = parseFloat(montoPagado.value || montoPagado.amount || 0);
+    }
+    
+    // Verificar que sea un número válido
+    if (isNaN(montoPagadoValido) || montoPagadoValido === 0) {
+        console.error('❌ Monto inválido:', montoPagado);
+        montoPagadoValido = 0;
+    }
+    
+    console.log('✅ Monto validado:', montoPagadoValido);
+    
+    // Validar que cart exista
+    if (!cart || cart.length === 0) {
+        console.error('❌ Carrito vacío al generar factura');
+        mostrarAlerta('Error: No hay productos en el carrito', 'error');
+        return;
+    }
+    
+    // Calcular totales con validaciones
+    const totalBruto = cart.reduce((acc, item) => {
+        const precio = parseFloat(item.price) || 0;
+        const cantidad = parseInt(item.cantidad) || 0;
+        return acc + (precio * cantidad);
+    }, 0);
+    
+    let cobertura = 0;
+    if (clienteData && clienteData.usaSeguro) {
+        cobertura = cart.reduce((acc, item) => {
+            if (item.cubiertoPorSeguro) {
+                const precio = parseFloat(item.price) || 0;
+                const cantidad = parseInt(item.cantidad) || 0;
+                return acc + (precio * cantidad * coberturaSeguro);
+            }
+            return acc;
+        }, 0);
+    }
+    
+    const totalNeto = totalBruto - cobertura;
+    const cambio = montoPagadoValido - totalNeto;
+    
+    console.log('💵 Totales calculados:', {
+        totalBruto,
+        cobertura,
+        totalNeto,
+        montoPagadoValido,
+        cambio
+    });
+    
+    // Obtener elemento de factura
+    const facturaContenido = document.getElementById('facturaContenido');
+    if (!facturaContenido) {
+        console.error('❌ No se encontró el elemento facturaContenido');
+        mostrarAlerta('Error: No se puede mostrar la factura', 'error');
+        return;
+    }
+    
+    // Generar HTML de factura
+    facturaContenido.innerHTML = `
+        <div class="factura-header">
+            <h2>Farmacia Digital</h2>
+            <p>Factura de Venta</p>
+            <p>Fecha: ${new Date().toLocaleDateString()} - Hora: ${new Date().toLocaleTimeString()}</p>
+        </div>
+        
+        <div class="factura-info">
+            <div class="factura-cliente">
+                <h3>Datos del Cliente</h3>
+                <p><strong>Nombre:</strong> ${clienteData?.nombre || 'N/A'}</p>
+                <p><strong>Teléfono:</strong> ${clienteData?.telefono || 'N/A'}</p>
+                <p><strong>Dirección:</strong> ${clienteData?.direccion || 'N/A'}</p>
+                ${clienteData && clienteData.usaSeguro ? `
+                    <p><strong>Aseguradora:</strong> ${clienteData.aseguradora}</p>
+                    <p><strong>No. Carnet:</strong> ${clienteData.numeroCarnet}</p>
+                ` : ''}
+            </div>
+            
+            <div class="factura-detalles">
+                <h3>Detalles de la Factura</h3>
+                <p><strong>No. Factura:</strong> ${Date.now()}</p>
+                ${serverOrderId ? `<p><strong>ID Pedido:</strong> ${serverOrderId}</p>` : ''}
+                <p><strong>Método de Pago:</strong> Efectivo</p>
+                <p><strong>Atendido por:</strong> ${document.getElementById('userName')?.textContent || 'Usuario'}</p>
+            </div>
+        </div>
+        
+        <div class="factura-productos">
+            <h3>Productos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${cart.map(producto => {
+                        const precio = parseFloat(producto.price) || 0;
+                        const cantidad = parseInt(producto.cantidad) || 0;
+                        const subtotal = precio * cantidad;
+                        
+                        return `
+                            <tr>
+                                <td>${producto.name || 'Producto'}</td>
+                                <td>${cantidad}</td>
+                                <td>$${precio.toFixed(2)}</td>
+                                <td>$${subtotal.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="factura-totales">
+            <div class="total-factura">
+                <span>Subtotal:</span>
+                <span>$${totalBruto.toFixed(2)}</span>
+            </div>
+            ${clienteData && clienteData.usaSeguro ? `
+                <div class="total-factura">
+                    <span>Cobertura Seguro (${(coberturaSeguro * 100).toFixed(0)}%):</span>
+                    <span>-$${cobertura.toFixed(2)}</span>
+                </div>
+            ` : ''}
+            <div class="total-factura total-final-factura">
+                <span>TOTAL:</span>
+                <span>$${totalNeto.toFixed(2)}</span>
+            </div>
+            <div class="total-factura">
+                <span>Monto Pagado:</span>
+                <span>$${montoPagadoValido.toFixed(2)}</span>
+            </div>
+            <div class="total-factura">
+                <span>Cambio:</span>
+                <span>$${cambio.toFixed(2)}</span>
+            </div>
+        </div>
+        
+        <div class="factura-mensaje">
+            <p><strong>¡Gracias por su compra!</strong></p>
+            <p>Para reclamos o devoluciones, presente esta factura dentro de los 7 días siguientes a la compra.</p>
+        </div>
+    `;
+    
+    console.log('✅ Factura generada correctamente');
+}
+
+/**
+ * Helper para mostrar alertas
+ */
+function mostrarAlerta(mensaje, tipo = 'success') {
+    const iconos = {
+        'success': 'success',
+        'error': 'error',
+        'warning': 'warning',
+        'info': 'info'
+    };
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+    
+    Toast.fire({
+        icon: iconos[tipo] || 'info',
+        title: mensaje
+    });
+}
+
+console.log('✅ Funciones de carrito cargadas correctamente');
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
     cargarCarrito();

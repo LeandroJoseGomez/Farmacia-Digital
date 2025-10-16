@@ -4,20 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de Inventario - Farmacia Digital</title>
-  <link rel="stylesheet" href="../assets/css/BD-Dashboard.css" />
+  <link rel="stylesheet" href="BD-Dashboard.css" />
   
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<body>
-  <div class="sidebar">
-    <div class="logo">💊 Farmacia</div>
-    <nav class="menu">
-      <button class="menu-btn active">🏠</button>
-      <button class="menu-btn">📦</button>
-      <button class="menu-btn">📊</button>
-      <button class="menu-btn">⚙️</button>
-    </nav>
-  </div>
+
 
   <div class="main-content">
     <header class="header">
@@ -31,7 +22,7 @@
 
       
       <section class="analisis-section">
-  <h2>Análisis de Productos</h2>
+  <h2 id="analisis-productos">Análisis de Productos</h2>
   <div class="analisis-container">
     <!-- Columna izquierda: lista de productos -->
     <div class="productos-lista">
@@ -93,9 +84,11 @@
         <canvas id="ventasPieChart"></canvas>
       </div>
 
-  <script src="../assets/js/script.js"></script>
+  <script src="script.js"></script>
 
-
+<!-- Elfsight AI Chatbot | Asistente Farmacia Digital -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-1b12611d-b7f6-4184-b3d6-911c87582fb9" data-elfsight-app-lazy></div>
 
 </body>
 </html>

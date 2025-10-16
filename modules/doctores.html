@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- Google Maps API placeholder (set YOUR_API_KEY si lo usas) -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+  <link rel="stylesheet" href="../assets/css/responsive.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     /* Inline styles from actualización (trimmed) */
@@ -558,7 +559,7 @@
         </a>
       </li>
        <li class="menu-item">
-        <a href="#">
+        <a href="perfil.html">
           <i>👤</i>
           <span>Mi Perfil</span>
         </a>
@@ -583,6 +584,15 @@
           <span>Contacto</span>
         </a>
       </li>
+
+      <li class="menu-item">
+        <a href="asesor.html">
+          <i>👨</i>
+          <span>Asesor</span>
+        </a>
+      </li>
+
+
 
     </ul>
   </div>
@@ -788,451 +798,535 @@
     </div>
   </div>
 
-  <script>
-    // Variables para el menú
-    const menuBtn = document.getElementById('menu-btn');
-    const sideMenu = document.getElementById('side-menu');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const closeBtn = document.getElementById('close-btn');
 
-    // Abrir menú
-    menuBtn.addEventListener('click', () => {
-      sideMenu.classList.add('active');
-      menuOverlay.classList.add('active');
+<script>
+// ============================================================
+
+// Variables para el menú
+const menuBtn = document.getElementById('menu-btn');
+const sideMenu = document.getElementById('side-menu');
+const menuOverlay = document.getElementById('menu-overlay');
+const closeBtn = document.getElementById('close-btn');
+
+// Abrir menú
+if (menuBtn) {
+  menuBtn.addEventListener('click', () => {
+    sideMenu.classList.add('active');
+    menuOverlay.classList.add('active');
+  });
+}
+
+// Cerrar menú
+function closeMenu() {
+  sideMenu.classList.remove('active');
+  menuOverlay.classList.remove('active');
+}
+
+if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+if (menuOverlay) menuOverlay.addEventListener('click', closeMenu);
+
+// ============================================================
+// 🔧 FUNCIÓN PARA CAMBIAR PESTAÑAS
+// ============================================================
+function switchTab(tabType) {
+  const doctorTab = document.getElementById('doctor-tab');
+  const pharmacistTab = document.getElementById('pharmacist-tab');
+  const tabButtons = document.querySelectorAll('.tab-button');
+  
+  tabButtons.forEach(btn => btn.classList.remove('active'));
+  
+  if (tabType === 'doctor') {
+    doctorTab.classList.add('active');
+    pharmacistTab.classList.remove('active');
+    tabButtons[0].classList.add('active');
+  } else {
+    pharmacistTab.classList.add('active');
+    doctorTab.classList.remove('active');
+    tabButtons[1].classList.add('active');
+  }
+  
+  document.getElementById('resultsContainer').style.display = 'none';
+}
+
+// ============================================================
+// 🔧 FUNCIÓN PARA BUSCAR DOCTORES (CON BD)
+// ============================================================
+async function searchDoctors(event) {
+  event.preventDefault();
+  
+  const ars = document.getElementById('arsSelect').value;
+  const city = document.getElementById('citySelect').value;
+  const specialty = document.getElementById('specialtySelect').value;
+  const center = document.getElementById('centerSelect').value;
+  const doctorName = document.getElementById('doctorName').value;
+
+  // Validación
+  if (!ars || !city || !specialty) {
+    Swal.fire({
+      title: 'Campos requeridos',
+      text: 'Por favor completa ARS, Ciudad y Especialidad para continuar',
+      icon: 'warning',
+      confirmButtonColor: '#00A8E8'
+    });
+    return;
+  }
+
+  // Mostrar loading
+  Swal.fire({
+    title: 'Buscando doctores...',
+    text: 'Por favor espera mientras buscamos los mejores profesionales para ti',
+    icon: 'info',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  try {
+    // Construir query params
+    const params = new URLSearchParams();
+    if (ars) params.append('ars', ars);
+    if (city) params.append('city', city);
+    if (specialty) params.append('specialty', specialty);
+    if (center) params.append('center', center);
+    if (doctorName) params.append('name', doctorName);
+
+    console.log('🔍 Buscando doctores con:', params.toString());
+
+    // Llamar a la API
+    const resp = await fetch(`../php/doctors.php?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
     });
 
-    // Cerrar menú
-    function closeMenu() {
-      sideMenu.classList.remove('active');
-      menuOverlay.classList.remove('active');
+    console.log('📡 Respuesta:', resp.status);
+
+    if (!resp.ok) {
+      throw new Error(`HTTP ${resp.status}`);
     }
 
-    closeBtn.addEventListener('click', closeMenu);
-    menuOverlay.addEventListener('click', closeMenu);
+    const text = await resp.text();
+    console.log('📄 Texto recibido:', text.substring(0, 200));
 
-    // Función para cambiar pestañas
-    function switchTab(tabType) {
-      const doctorTab = document.getElementById('doctor-tab');
-      const pharmacistTab = document.getElementById('pharmacist-tab');
-      const tabButtons = document.querySelectorAll('.tab-button');
-      
-      // Remover active de todos los botones
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      
-      if (tabType === 'doctor') {
-        doctorTab.classList.add('active');
-        pharmacistTab.classList.remove('active');
-        tabButtons[0].classList.add('active');
-      } else {
-        pharmacistTab.classList.add('active');
-        doctorTab.classList.remove('active');
-        tabButtons[1].classList.add('active');
-      }
-      
-      // Ocultar resultados al cambiar de pestaña
-      document.getElementById('resultsContainer').style.display = 'none';
+    let json = null;
+    try {
+      json = JSON.parse(text);
+    } catch (parseErr) {
+      console.error('❌ Error parseando JSON:', parseErr);
+      throw new Error('Respuesta inválida del servidor');
     }
 
-    // Función para buscar doctores (intenta el endpoint php/doctors.php, fallback a datos locales)
-    async function searchDoctors(event) {
-      event.preventDefault();
-      
-      const ars = document.getElementById('arsSelect').value;
-      const city = document.getElementById('citySelect').value;
-      const specialty = document.getElementById('specialtySelect').value;
-      const center = document.getElementById('centerSelect').value;
-      const doctorName = document.getElementById('doctorName').value;
+    console.log('✅ Datos parseados:', json);
 
-      // Validación
-      if (!ars || !city || !specialty) {
-        Swal.fire({
-          title: 'Campos requeridos',
-          text: 'Por favor completa ARS, Ciudad y Especialidad para continuar',
-          icon: 'warning',
-          confirmButtonColor: '#00A8E8'
-        });
-        return;
-      }
+    Swal.close();
 
-      // Mostrar loading
-      Swal.fire({
-        title: 'Buscando doctores...',
-        text: 'Por favor espera mientras buscamos los mejores profesionales para ti',
-        icon: 'info',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
-
-      // Intentar llamar al servidor
-      try {
-        const params = new URLSearchParams();
-        if (ars) params.append('ars', ars);
-        if (city) params.append('city', city);
-        if (specialty) params.append('specialty', specialty);
-        if (center) params.append('center', center);
-        if (doctorName) params.append('name', doctorName);
-
-        const resp = await fetch(`../php/doctors.php?${params.toString()}`);
-        if (resp.ok) {
-          const text = await resp.text();
-          if (!text || text.trim() === '') {
-            console.warn('doctors.php respondió vacío, usando fallback');
-          } else {
-            try {
-              const json = JSON.parse(text);
-              if (json.status === 'ok' && Array.isArray(json.doctors)) {
-                Swal.close();
-                return displayDoctorResultsFromArray(json.doctors);
-              }
-            } catch (parseErr) {
-              console.warn('No se pudo parsear JSON de doctors.php, usando fallback', parseErr);
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('Error calling php/doctors.php, using fallback', e);
-      }
-
-      // Fallback a la lógica previa con sampleDoctors (espera 1s para simular búsqueda)
-      setTimeout(() => {
-        Swal.close();
-        displayDoctorResults(ars, city, specialty, center, doctorName);
-      }, 800);
+    if (json.status === 'ok' && Array.isArray(json.doctors)) {
+      displayDoctorResults(json.doctors);
+    } else {
+      throw new Error('Formato de respuesta inválido');
     }
 
-    // Helper para renderizar cuando ya tenemos un array de doctores (desde servidor)
-    function displayDoctorResultsFromArray(doctorsArray) {
-      const resultsContainer = document.getElementById('resultsContainer');
-      const resultsContent = document.getElementById('resultsContent');
+  } catch (err) {
+    console.error('❌ Error:', err);
+    Swal.close();
+    
+    Swal.fire({
+      title: 'Error al buscar',
+      text: 'No se pudieron cargar los doctores. Intenta nuevamente.',
+      icon: 'error',
+      confirmButtonColor: '#00A8E8'
+    });
+  }
+}
 
-      if (!doctorsArray || doctorsArray.length === 0) {
-        resultsContent.innerHTML = `
-          <div class="no-results">
-            <h3>😔 No se encontraron doctores</h3>
-            <p>No se encontraron doctores que coincidan con tus criterios de búsqueda.</p>
-            <button class="search-btn" onclick="clearDoctorSearch()" style="margin-top: 1rem;">🔄 Nueva Búsqueda</button>
-          </div>
-        `;
-      } else {
-        resultsContent.innerHTML = `
-          <div style="text-align: center; margin-bottom: 2rem;">
-            <h3 style="color: #00A8E8; margin-bottom: 0.5rem;">📋 ${doctorsArray.length} Doctor${doctorsArray.length > 1 ? 'es' : ''} Encontrado${doctorsArray.length > 1 ? 's' : ''}</h3>
-            <p style="color: #666;">Resultados que coinciden con tus criterios de búsqueda</p>
-          </div>
-          ${doctorsArray.map(doctor => `
-            <div class="doctor-card">
-              <div class="doctor-name">${doctor.name}</div>
-              <div class="doctor-info"><strong>📋 Especialidad:</strong> ${doctor.specialty}</div>
-              <div class="doctor-info"><strong>🏥 Centro:</strong> ${doctor.center || ''}</div>
-              <div class="doctor-info"><strong>📍 Ubicación:</strong> ${doctor.city || ''}</div>
-              <div class="doctor-info"><strong>📞 Teléfono:</strong> ${doctor.phone || ''}</div>
-              <div class="doctor-info"><strong>🕒 Horario:</strong> ${doctor.schedule || ''}</div>
-              <div class="doctor-info"><strong>⭐ Experiencia:</strong> ${doctor.experience || ''}</div>
-              <div class="doctor-actions">
-                <button class="action-btn" onclick="contactDoctor('${doctor.name}', '${doctor.phone || ''}')">📞 Llamar</button>
-                <button class="action-btn secondary" onclick="scheduleAppointment('${doctor.name}', '${doctor.email || ''}')">📅 Agendar Cita</button>
-                <button class="action-btn" onclick="sendEmail('${doctor.email || ''}', '${doctor.name}')">📧 Email</button>
-              </div>
-            </div>
-          `).join('')}
-        `;
-      }
+// ============================================================
+// 🔧 MOSTRAR RESULTADOS DE DOCTORES
+// ============================================================
+function displayDoctorResults(doctors) {
+  const resultsContainer = document.getElementById('resultsContainer');
+  const resultsContent = document.getElementById('resultsContent');
 
-      resultsContainer.style.display = 'block';
-      resultsContainer.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Función para mostrar resultados de doctores
-    function displayDoctorResults(ars, city, specialty, center, doctorName) {
-      // Los doctores deben provenir del servidor; aquí usamos un array vacío como fallback
-      // If you want local sample data for offline testing, populate this array with objects matching
-      // { name, specialty, center, city, ars: [...], phone, schedule, email, experience }
-      const sampleDoctors = [];
-
-      // Filtrar doctores basado en los criterios
-      let filteredDoctors = sampleDoctors.filter(doctor => {
-        let matchesArs = !ars || doctor.ars.includes(ars);
-        let matchesCity = !city || doctor.city.toLowerCase().includes(city.toLowerCase().replace('-', ' '));
-        let matchesSpecialty = !specialty || doctor.specialty.toLowerCase().includes(specialty.toLowerCase().replace('-', ' '));
-        let matchesCenter = !center || doctor.center.toLowerCase().includes(center.toLowerCase().replace('-', ' '));
-        let matchesName = !doctorName || doctor.name.toLowerCase().includes(doctorName.toLowerCase());
+  if (!doctors || doctors.length === 0) {
+    resultsContent.innerHTML = `
+      <div class="no-results">
+        <h3>😔 No se encontraron doctores</h3>
+        <p>No se encontraron doctores que coincidan con tus criterios de búsqueda.</p>
+        <p><strong>Sugerencias:</strong></p>
+        <ul style="text-align: left; max-width: 400px; margin: 1rem auto;">
+          <li>Verifica que hayas seleccionado correctamente tu ARS</li>
+          <li>Intenta con una ciudad cercana</li>
+          <li>Considera otras especialidades relacionadas</li>
+          <li>Deja el campo "Centro Médico" vacío para más opciones</li>
+        </ul>
+        <button class="search-btn" onclick="clearDoctorSearch()" style="margin-top: 1rem;">
+          🔄 Nueva Búsqueda
+        </button>
+      </div>
+    `;
+  } else {
+    resultsContent.innerHTML = `
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h3 style="color: #00A8E8; margin-bottom: 0.5rem;">
+          📋 ${doctors.length} Doctor${doctors.length > 1 ? 'es' : ''} Encontrado${doctors.length > 1 ? 's' : ''}
+        </h3>
+        <p style="color: #666;">Resultados que coinciden con tus criterios de búsqueda</p>
+      </div>
+      ${doctors.map(doctor => {
+        const arsText = Array.isArray(doctor.ars) ? doctor.ars.join(', ') : '';
         
-        return matchesArs && matchesCity && matchesSpecialty && matchesCenter && matchesName;
-      });
-
-      const resultsContainer = document.getElementById('resultsContainer');
-      const resultsContent = document.getElementById('resultsContent');
-      
-      if (filteredDoctors.length === 0) {
-        resultsContent.innerHTML = `
-          <div class="no-results">
-            <h3>😔 No se encontraron doctores</h3>
-            <p>No se encontraron doctores que coincidan con tus criterios de búsqueda.</p>
-            <p><strong>Sugerencias:</strong></p>
-            <ul style="text-align: left; max-width: 400px; margin: 1rem auto;">
-              <li>Verifica que hayas seleccionado correctamente tu ARS</li>
-              <li>Intenta con una ciudad cercana</li>
-              <li>Considera otras especialidades relacionadas</li>
-              <li>Deja el campo "Centro Médico" vacío para más opciones</li>
-            </ul>
-            <button class="search-btn" onclick="clearDoctorSearch()" style="margin-top: 1rem;">
-              🔄 Nueva Búsqueda
-            </button>
-          </div>
-        `;
-      } else {
-        resultsContent.innerHTML = `
-          <div style="text-align: center; margin-bottom: 2rem;">
-            <h3 style="color: #00A8E8; margin-bottom: 0.5rem;">
-              📋 ${filteredDoctors.length} Doctor${filteredDoctors.length > 1 ? 'es' : ''} Encontrado${filteredDoctors.length > 1 ? 's' : ''}
-            </h3>
-            <p style="color: #666;">Resultados que coinciden con tus criterios de búsqueda</p>
-          </div>
-          ${filteredDoctors.map(doctor => `
-            <div class="doctor-card">
-              <div class="doctor-name">${doctor.name}</div>
+        return `
+          <div class="doctor-card">
+            <div class="doctor-name">${doctor.name}</div>
+            <div class="doctor-info">
+              <strong>📋 Especialidad:</strong> ${doctor.specialty}
+            </div>
+            <div class="doctor-info">
+              <strong>🏥 Centro:</strong> ${doctor.center || 'N/A'}
+            </div>
+            <div class="doctor-info">
+              <strong>📍 Ubicación:</strong> ${doctor.city || 'N/A'}
+            </div>
+            <div class="doctor-info">
+              <strong>📞 Teléfono:</strong> ${doctor.phone || 'N/A'}
+            </div>
+            <div class="doctor-info">
+              <strong>🕒 Horario:</strong> ${doctor.schedule || 'Consultar'}
+            </div>
+            <div class="doctor-info">
+              <strong>⭐ Experiencia:</strong> ${doctor.experience || 'N/A'}
+            </div>
+            ${arsText ? `
               <div class="doctor-info">
-                <strong>📋 Especialidad:</strong> ${doctor.specialty}
+                <strong>🏥 ARS Aceptados:</strong> ${arsText}
               </div>
-              <div class="doctor-info">
-                <strong>🏥 Centro:</strong> ${doctor.center}
-              </div>
-              <div class="doctor-info">
-                <strong>📍 Ubicación:</strong> ${doctor.city}
-              </div>
-              <div class="doctor-info">
-                <strong>📞 Teléfono:</strong> ${doctor.phone}
-              </div>
-              <div class="doctor-info">
-                <strong>🕒 Horario:</strong> ${doctor.schedule}
-              </div>
-              <div class="doctor-info">
-                <strong>⭐ Experiencia:</strong> ${doctor.experience}
-              </div>
-              <div class="doctor-actions">
-                <button class="action-btn" onclick="contactDoctor('${doctor.name}', '${doctor.phone}')">
-                  📞 Llamar
-                </button>
-                <button class="action-btn secondary" onclick="scheduleAppointment('${doctor.name}', '${doctor.email}')">
-                  📅 Agendar Cita
-                </button>
+            ` : ''}
+            <div class="doctor-actions">
+              <button class="action-btn" onclick="contactDoctor('${doctor.name}', '${doctor.phone || ''}')">
+                📞 Llamar
+              </button>
+              <button class="action-btn secondary" onclick="scheduleAppointment('${doctor.name}', '${doctor.email || ''}')">
+                📅 Agendar Cita
+              </button>
+              ${doctor.email ? `
                 <button class="action-btn" onclick="sendEmail('${doctor.email}', '${doctor.name}')">
                   📧 Email
                 </button>
-              </div>
+              ` : ''}
             </div>
-          `).join('')}
+          </div>
         `;
-      }
-      
-      resultsContainer.style.display = 'block';
-      
-      // Scroll hacia los resultados
-      resultsContainer.scrollIntoView({ behavior: 'smooth' });
-    }
+      }).join('')}
+    `;
+  }
+  
+  resultsContainer.style.display = 'block';
+  resultsContainer.scrollIntoView({ behavior: 'smooth' });
+}
 
-    // Función para contactar doctor
-    function contactDoctor(doctorName, phone) {
-      Swal.fire({
-        title: `📞 Contactar a ${doctorName}`,
-        html: `
-          <div style="text-align: left;">
-            <p><strong>Teléfono:</strong> ${phone}</p>
-            <p style="margin-top: 1rem;">¿Qué deseas hacer?</p>
-          </div>
-        `,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#00A8E8',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '📞 Llamar Ahora',
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = `tel:${phone}`;
-        }
-      });
-    }
+// ============================================================
+// 🔧 CONSULTA A FARMACÉUTICO (CON BD)
+// ============================================================
+async function consultPharmacist(event) {
+  event.preventDefault();
+  
+  const consultType = document.getElementById('consultType').value;
+  const medicationName = document.getElementById('medicationName').value;
+  const description = document.getElementById('consultDescription').value;
+  const patientName = document.getElementById('patientName').value;
+  const phone = document.getElementById('phoneNumber').value;
+  const email = document.getElementById('emailAddress').value;
 
-    // Función para agendar cita
-    function scheduleAppointment(doctorName, email) {
-      Swal.fire({
-        title: `📅 Agendar cita con ${doctorName}`,
-        html: `
-          <div style="text-align: left;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Fecha preferida:</label>
-            <input type="date" id="appointmentDate" class="swal2-input" style="margin-bottom: 1rem;" min="${new Date().toISOString().split('T')[0]}">
-            
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Hora preferida:</label>
-            <select id="appointmentTime" class="swal2-input" style="margin-bottom: 1rem;">
-              <option value="">Seleccionar hora...</option>
-              <option value="08:00">8:00 AM</option>
-              <option value="08:30">8:30 AM</option>
-              <option value="09:00">9:00 AM</option>
-              <option value="09:30">9:30 AM</option>
-              <option value="10:00">10:00 AM</option>
-              <option value="10:30">10:30 AM</option>
-              <option value="11:00">11:00 AM</option>
-              <option value="11:30">11:30 AM</option>
-              <option value="14:00">2:00 PM</option>
-              <option value="14:30">2:30 PM</option>
-              <option value="15:00">3:00 PM</option>
-              <option value="15:30">3:30 PM</option>
-              <option value="16:00">4:00 PM</option>
-              <option value="16:30">4:30 PM</option>
-              <option value="17:00">5:00 PM</option>
-            </select>
-            
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Motivo de consulta:</label>
-            <textarea id="appointmentReason" class="swal2-textarea" placeholder="Describe brevemente el motivo de tu consulta..."></textarea>
-            
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Tu teléfono:</label>
-            <input type="tel" id="patientPhone" class="swal2-input" placeholder="809-XXX-XXXX">
-          </div>
-        `,
-        showCancelButton: true,
-        confirmButtonColor: '#00A8E8',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '📅 Solicitar Cita',
-        cancelButtonText: 'Cancelar',
-        preConfirm: () => {
-          const date = document.getElementById('appointmentDate').value;
-          const time = document.getElementById('appointmentTime').value;
-          const reason = document.getElementById('appointmentReason').value;
-          const phone = document.getElementById('patientPhone').value;
-          
-          if (!date || !time || !reason || !phone) {
-            Swal.showValidationMessage('Por favor completa todos los campos');
-            return false;
-          }
-          
-          return { date, time, reason, phone };
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: '✅ Solicitud enviada exitosamente',
-            html: `
-              <p>Tu solicitud de cita con <strong>${doctorName}</strong> ha sido enviada.</p>
-              <p><strong>Fecha:</strong> ${result.value.date}</p>
-              <p><strong>Hora:</strong> ${result.value.time}</p>
-              <p>Te contactaremos al <strong>${result.value.phone}</strong> para confirmar la disponibilidad.</p>
-              <p><em>Recibirás confirmación en las próximas 24 horas.</em></p>
-            `,
-            icon: 'success',
-            confirmButtonColor: '#00A8E8'
-          });
-        }
-      });
-    }
-
-    // Función para enviar email
-    function sendEmail(email, doctorName) {
-      const subject = encodeURIComponent(`Consulta médica - ${doctorName}`);
-      const body = encodeURIComponent(`Estimado/a ${doctorName},\n\nMe pongo en contacto con usted a través de la plataforma Farmacia Digital para solicitar información sobre...\n\nSaludos cordiales.`);
-      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-    }
-
-    // Función para consulta a farmacéutico
-    function consultPharmacist(event) {
-      event.preventDefault();
-      
-      const consultType = document.getElementById('consultType').value;
-      const medicationName = document.getElementById('medicationName').value;
-      const description = document.getElementById('consultDescription').value;
-      const patientName = document.getElementById('patientName').value;
-      const phone = document.getElementById('phoneNumber').value;
-      const email = document.getElementById('emailAddress').value;
-
-      // Mostrar loading
-      Swal.fire({
-        title: 'Enviando consulta...',
-        text: 'Por favor espera mientras procesamos tu consulta',
-        icon: 'info',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-        timer: 2000
-      }).then(() => {
-        Swal.fire({
-          title: '✅ Consulta enviada exitosamente',
-          html: `
-            <div style="text-align: left;">
-              <p>Hola <strong>${patientName}</strong>,</p>
-              <p>Tu consulta sobre <strong>"${consultType}"</strong> ha sido recibida exitosamente.</p>
-              ${medicationName ? `<p><strong>Medicamento:</strong> ${medicationName}</p>` : ''}
-              <p><strong>Contacto:</strong> ${phone}</p>
-              ${email ? `<p><strong>Email:</strong> ${email}</p>` : ''}
-              <hr style="margin: 1rem 0;">
-              <p><strong>📞 Próximos pasos:</strong></p>
-              <ul>
-                <li>Nuestro farmacéutico especializado te contactará en las próximas 2 horas</li>
-                <li>Horario de atención: Lun-Vie 8:00 AM - 6:00 PM</li>
-                <li>Sábados: 8:00 AM - 2:00 PM</li>
-              </ul>
-              <p><em>Si es una emergencia, acude al centro médico más cercano.</em></p>
-            </div>
-          `,
-          icon: 'success',
-          confirmButtonColor: '#00A8E8',
-          confirmButtonText: 'Entendido'
-        }).then(() => {
-          // Limpiar formulario
-          document.getElementById('consultType').value = '';
-          document.getElementById('medicationName').value = '';
-          document.getElementById('consultDescription').value = '';
-          document.getElementById('patientName').value = '';
-          document.getElementById('phoneNumber').value = '';
-          document.getElementById('emailAddress').value = '';
-        });
-      });
-    }
-
-    // Función para limpiar búsqueda
-    function clearDoctorSearch() {
-      document.getElementById('arsSelect').value = '';
-      document.getElementById('citySelect').value = '';
-      document.getElementById('specialtySelect').value = '';
-      document.getElementById('centerSelect').value = '';
-      document.getElementById('doctorName').value = '';
-      document.getElementById('resultsContainer').style.display = 'none';
-    }
-
-    // Función para cerrar sesión
-    function logout() {
-      Swal.fire({
-        title: '¿Cerrar sesión?',
-        text: '¿Estás seguro de que deseas cerrar sesión?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#00A8E8',
-        cancelButtonColor: '#dc3545',
-        confirmButtonText: 'Sí, cerrar sesión',
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: 'Sesión cerrada',
-            text: 'Has cerrado sesión exitosamente',
-            icon: 'success',
-            showConfirmButton: false,
-            timer: 1500
-          }).then(() => {
-            window.location.href = 'farmacia-digital-FONDO-Y-CATEGORIAS-ORIGINALES.html';
-          });
-        }
-      });
-    }
-
-    // Tecla Escape para cerrar menú
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeMenu();
-      }
+  if (!consultType || !description || !patientName || !phone) {
+    Swal.fire({
+      title: 'Campos requeridos',
+      text: 'Por favor completa todos los campos obligatorios',
+      icon: 'warning',
+      confirmButtonColor: '#00A8E8'
     });
-  </script>
+    return;
+  }
+
+  // Mostrar loading
+  Swal.fire({
+    title: 'Enviando consulta...',
+    text: 'Por favor espera',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  try {
+    const payload = {
+      patient_name: patientName,
+      phone: phone,
+      email: email,
+      consult_type: consultType,
+      medication_name: medicationName,
+      description: description
+    };
+
+    console.log('📤 Enviando consulta:', payload);
+
+    const resp = await fetch('../php/doctors.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    console.log('📡 Respuesta:', resp.status);
+
+    const text = await resp.text();
+    console.log('📄 Respuesta texto:', text);
+
+    let json = null;
+    try {
+      json = JSON.parse(text);
+    } catch (parseErr) {
+      console.error('❌ Error parseando JSON:', parseErr);
+      throw new Error('Respuesta inválida del servidor');
+    }
+
+    Swal.close();
+
+    if (json.status === 'ok') {
+      Swal.fire({
+        title: '✅ Consulta enviada exitosamente',
+        html: `
+          <div style="text-align: left;">
+            <p>Hola <strong>${patientName}</strong>,</p>
+            <p>Tu consulta sobre <strong>"${consultType}"</strong> ha sido recibida exitosamente.</p>
+            ${medicationName ? `<p><strong>Medicamento:</strong> ${medicationName}</p>` : ''}
+            <p><strong>Contacto:</strong> ${phone}</p>
+            ${email ? `<p><strong>Email:</strong> ${email}</p>` : ''}
+            <hr style="margin: 1rem 0;">
+            <p><strong>📞 Próximos pasos:</strong></p>
+            <ul>
+              <li>Nuestro farmacéutico especializado te contactará en las próximas 2 horas</li>
+              <li>Horario de atención: Lun-Vie 8:00 AM - 6:00 PM</li>
+              <li>Sábados: 8:00 AM - 2:00 PM</li>
+            </ul>
+            <p><em>Si es una emergencia, acude al centro médico más cercano.</em></p>
+          </div>
+        `,
+        icon: 'success',
+        confirmButtonColor: '#00A8E8',
+        confirmButtonText: 'Entendido'
+      }).then(() => {
+        // Limpiar formulario
+        document.getElementById('consultType').value = '';
+        document.getElementById('medicationName').value = '';
+        document.getElementById('consultDescription').value = '';
+        document.getElementById('patientName').value = '';
+        document.getElementById('phoneNumber').value = '';
+        document.getElementById('emailAddress').value = '';
+      });
+    } else {
+      throw new Error(json.message || 'Error al enviar consulta');
+    }
+
+  } catch (err) {
+    console.error('❌ Error:', err);
+    Swal.close();
+    
+    Swal.fire({
+      title: 'Error',
+      text: 'No se pudo enviar la consulta. Intenta nuevamente.',
+      icon: 'error',
+      confirmButtonColor: '#00A8E8'
+    });
+  }
+}
+
+// ============================================================
+// 🔧 FUNCIONES DE ACCIÓN
+// ============================================================
+
+function contactDoctor(doctorName, phone) {
+  if (!phone || phone === 'N/A') {
+    Swal.fire({
+      title: 'Teléfono no disponible',
+      text: 'Este doctor no tiene teléfono registrado.',
+      icon: 'info',
+      confirmButtonColor: '#00A8E8'
+    });
+    return;
+  }
+
+  Swal.fire({
+    title: `📞 Contactar a ${doctorName}`,
+    html: `
+      <div style="text-align: left;">
+        <p><strong>Teléfono:</strong> ${phone}</p>
+        <p style="margin-top: 1rem;">¿Qué deseas hacer?</p>
+      </div>
+    `,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#00A8E8',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: '📞 Llamar Ahora',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = `tel:${phone}`;
+    }
+  });
+}
+
+function scheduleAppointment(doctorName, email) {
+  Swal.fire({
+    title: `📅 Agendar cita con ${doctorName}`,
+    html: `
+      <div style="text-align: left;">
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Fecha preferida:</label>
+        <input type="date" id="appointmentDate" class="swal2-input" style="margin-bottom: 1rem;" min="${new Date().toISOString().split('T')[0]}">
+        
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Hora preferida:</label>
+        <select id="appointmentTime" class="swal2-input" style="margin-bottom: 1rem;">
+          <option value="">Seleccionar hora...</option>
+          <option value="08:00">8:00 AM</option>
+          <option value="08:30">8:30 AM</option>
+          <option value="09:00">9:00 AM</option>
+          <option value="09:30">9:30 AM</option>
+          <option value="10:00">10:00 AM</option>
+          <option value="10:30">10:30 AM</option>
+          <option value="11:00">11:00 AM</option>
+          <option value="11:30">11:30 AM</option>
+          <option value="14:00">2:00 PM</option>
+          <option value="14:30">2:30 PM</option>
+          <option value="15:00">3:00 PM</option>
+          <option value="15:30">3:30 PM</option>
+          <option value="16:00">4:00 PM</option>
+          <option value="16:30">4:30 PM</option>
+          <option value="17:00">5:00 PM</option>
+        </select>
+        
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Motivo de consulta:</label>
+        <textarea id="appointmentReason" class="swal2-textarea" placeholder="Describe brevemente el motivo de tu consulta..."></textarea>
+        
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Tu teléfono:</label>
+        <input type="tel" id="patientPhone" class="swal2-input" placeholder="809-XXX-XXXX">
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonColor: '#00A8E8',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: '📅 Solicitar Cita',
+    cancelButtonText: 'Cancelar',
+    preConfirm: () => {
+      const date = document.getElementById('appointmentDate').value;
+      const time = document.getElementById('appointmentTime').value;
+      const reason = document.getElementById('appointmentReason').value;
+      const phone = document.getElementById('patientPhone').value;
+      
+      if (!date || !time || !reason || !phone) {
+        Swal.showValidationMessage('Por favor completa todos los campos');
+        return false;
+      }
+      
+      return { date, time, reason, phone };
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: '✅ Solicitud enviada exitosamente',
+        html: `
+          <p>Tu solicitud de cita con <strong>${doctorName}</strong> ha sido enviada.</p>
+          <p><strong>Fecha:</strong> ${result.value.date}</p>
+          <p><strong>Hora:</strong> ${result.value.time}</p>
+          <p>Te contactaremos al <strong>${result.value.phone}</strong> para confirmar la disponibilidad.</p>
+          <p><em>Recibirás confirmación en las próximas 24 horas.</em></p>
+        `,
+        icon: 'success',
+        confirmButtonColor: '#00A8E8'
+      });
+    }
+  });
+}
+
+function sendEmail(email, doctorName) {
+  if (!email || email === 'N/A') {
+    Swal.fire({
+      title: 'Email no disponible',
+      text: 'Este doctor no tiene email registrado.',
+      icon: 'info',
+      confirmButtonColor: '#00A8E8'
+    });
+    return;
+  }
+
+  const subject = encodeURIComponent(`Consulta médica - ${doctorName}`);
+  const body = encodeURIComponent(`Estimado/a ${doctorName},\n\nMe pongo en contacto con usted a través de la plataforma Farmacia Digital para solicitar información sobre...\n\nSaludos cordiales.`);
+  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+}
+
+function clearDoctorSearch() {
+  document.getElementById('arsSelect').value = '';
+  document.getElementById('citySelect').value = '';
+  document.getElementById('specialtySelect').value = '';
+  document.getElementById('centerSelect').value = '';
+  document.getElementById('doctorName').value = '';
+  document.getElementById('resultsContainer').style.display = 'none';
+}
+
+function logout() {
+  Swal.fire({
+    title: '¿Cerrar sesión?',
+    text: '¿Estás seguro de que deseas cerrar sesión?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#00A8E8',
+    cancelButtonColor: '#dc3545',
+    confirmButtonText: 'Sí, cerrar sesión',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('loggedUser');
+      localStorage.removeItem('cart');
+      
+      Swal.fire({
+        title: 'Sesión cerrada',
+        text: 'Has cerrado sesión exitosamente',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500
+      }).then(() => {
+        window.location.href = '../index.html';
+      });
+    }
+  });
+}
+
+// Tecla Escape para cerrar menú
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeMenu();
+  }
+});
+
+// Inicialización al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('✅ Página de doctores cargada correctamente');
+  
+  // Verificar usuario logueado
+  const loggedUser = localStorage.getItem('loggedUser');
+  if (!loggedUser) {
+    Swal.fire({
+      title: 'Sesión requerida',
+      text: 'Debes iniciar sesión para acceder a esta sección',
+      icon: 'warning',
+      confirmButtonColor: '#00A8E8'
+    }).then(() => {
+      window.location.href = '../index.html';
+    });
+  }
+});
+</script>
 </body>
 </html>
